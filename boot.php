@@ -35,10 +35,7 @@ include PATH . 'config.ini.php';
 /**
  * 启动数据库连接
  */
-$medoo_db_config = $config;
-if (!file_exists('db_active_main')) {
-  include NexoPHP_PATH . 'db/boot.php';
-}
+include NexoPHP_PATH . 'db/boot.php';
 /**
  * 加载autoload
  */
