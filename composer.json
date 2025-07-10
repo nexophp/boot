@@ -1,0 +1,28 @@
+{
+    "name": "nexophp/boot",
+    "type": "library",
+    "description": "",
+    "keywords": [
+        "php"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "sunkangchina",
+            "email": "68103403@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "nexophp/element": "dev-main",
+        "nexophp/vue": "dev-main",
+        "nexophp/db": "dev-main", 
+        "phpseclib/phpseclib": "^2",
+        "phpoffice/phpspreadsheet": "^1",
+        "spatie/array-to-xml": "^2.16",
+        "ramsey/uuid": "^4",
+        "endroid/qr-code": "^4",
+        "erusev/parsedown": "^1",
+        "intervention/image": "^3"
+    }
+}
