@@ -2,7 +2,7 @@
 
 安装 
 ~~~
-composer require thefunpower/core-boot
+composer require nexophp/boot
 ~~~
 
 路由
