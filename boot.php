@@ -45,6 +45,11 @@ if (!$autoload) {
 }
 $autoload->addPsr4('app\\', PATH . 'app/');
 $autoload->addPsr4('modules\\', PATH . 'modules/');
+include __DIR__ . '/inc/function.php';
+include __DIR__ . '/inc/cross.php';
+include __DIR__ . '/inc/install.php';
+include __DIR__ . '/inc/jwt.php';
+include __DIR__ . '/inc/request.php';
 return IRoute::do(function () {
   /**
    * 路由后

@@ -12,16 +12,30 @@
             "email": "68103403@qq.com"
         }
     ],
-    "require": { 
+    "require": {
         "nexophp/element": "dev-main",
         "nexophp/vue": "dev-main",
-        "nexophp/db": "dev-main", 
+        "nexophp/db": "dev-main",
         "phpseclib/phpseclib": "^2",
         "phpoffice/phpspreadsheet": "^1",
         "spatie/array-to-xml": "^2.16",
         "ramsey/uuid": "^4",
         "endroid/qr-code": "^4",
         "erusev/parsedown": "^1",
-        "intervention/image": "^3"
+        "intervention/image": "^3",
+        "alchemy/zippy": "^1",
+        "firebase/php-jwt": "^5",
+        "guzzlehttp/guzzle": "^7",
+        "symfony/yaml": "^5.3",
+        "vlucas/valitron": "^1.4",
+        "symfony/mailer": "^5.4",
+        "predis/predis": "^2.0",
+        "voku/anti-xss": "^4.1"
+    },
+    "psr-0": {
+        "Upload": "./composer/codeguy/upload/src/"
+    },
+    "psr-4": {
+        "lib\\": "./lib/"
     }
 }
