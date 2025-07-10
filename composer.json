@@ -12,8 +12,7 @@
             "email": "68103403@qq.com"
         }
     ],
-    "require": {
-        "php": ">=7.1",
+    "require": { 
         "nexophp/element": "dev-main",
         "nexophp/vue": "dev-main",
         "nexophp/db": "dev-main", 
