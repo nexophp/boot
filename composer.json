@@ -27,7 +27,7 @@
         "firebase/php-jwt": "^5",
         "guzzlehttp/guzzle": "^7",
         "symfony/yaml": "^5",
-        "vlucas/valitron": "^1",
+        "vlucas/valitron": "^1.4",
         "symfony/mailer": "^5",
         "symfony/lock": "^6",
         "predis/predis": "^2",
