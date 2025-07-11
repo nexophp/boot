@@ -479,13 +479,12 @@
      * global $remote_to_local_path;
      * $remote_to_local_path = '/uploads/saved/'.date("Y-m-d");
      */
-    function download_remote_file($url, $path = '', $name = '')
+    function download_remote_file($url, $path = '')
     {
         global $remote_to_local_path;
         $remote_to_local_path = $remote_to_local_path ?: '/uploads/tmp/' . date("Y-m-d");
-        $name = $name ?: $remote_to_local_path . '/' . md5($url) . '.' . get_ext_by_url($url);
-        $path = $path ?: WWW_PATH;
-        $file = $path . $name;
+        $local_url = $remote_to_local_path . '/' . md5($url) . '.' . get_ext_by_url($url);
+        $file = WWW_PATH . $local_url;
         if (!file_exists($file) || (file_exists($file) && filesize($file) < 10)) {
             $context = get_remote_file($url);
             $mime = get_mime($url);
@@ -497,7 +496,7 @@
             }
             file_put_contents($file, $context);
         }
-        return cdn() . $name;
+        return cdn() . $local_url;
     }
     /**
      * 调用阿里云
@@ -540,7 +539,7 @@
         curl_setopt($curl, CURLOPT_FAILONERROR, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, true);
-        if (1 == strpos("$" . $host, "https://")) {
+        if (1 == strpos("$" . $url, "https://")) {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         }
@@ -1742,9 +1741,6 @@
      */
     function zip_extract($local_file, $extract_local_dir)
     {
-        if (strpos($local_file, '/uploads/') !== false && strpos($local_file, '://') !== false) {
-            $local_file = PATH . substr($local_file, strpos($local_file, '/uploads/') + 1);
-        }
         if (!file_exists($local_file)) {
             return false;
         }

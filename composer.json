@@ -31,8 +31,8 @@
         "predis/predis": "^2",
         "voku/anti-xss": "^4",
         "picqer/php-barcode-generator": "^2",
-        "vlucas/valitron": "*",
-        "endroid/qr-code": "*"
+        "vlucas/valitron": "^1.4",
+        "endroid/qr-code": "^6.0"
     },
     "psr-0": {
         "Upload": "./composer/codeguy/upload/src/"
