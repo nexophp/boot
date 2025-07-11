@@ -46,10 +46,31 @@ if (!$autoload) {
 $autoload->addPsr4('app\\', PATH . 'app/');
 $autoload->addPsr4('modules\\', PATH . 'modules/');
 include __DIR__ . '/inc/function.php';
-include __DIR__ . '/inc/cross.php';
-include __DIR__ . '/inc/install.php';
 include __DIR__ . '/inc/jwt.php';
 include __DIR__ . '/inc/request.php';
+/**
+ * TRIM
+ */
+global_trim();
+/**
+ * 允许跨域
+ */
+allow_cross_origin();
+/**
+ * 页面渲染头部
+ */
+add_action("header", function () {
+  render_css_file();
+  render_css();
+  render_js_file();
+});
+
+/**
+ * 页面渲染底部
+ */
+add_action("footer", function () {
+  render_js();
+});
 return IRoute::do(function () {
   /**
    * 路由后

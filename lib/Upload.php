@@ -5,15 +5,15 @@ namespace lib;
 use Upload\Storage\FileSystem;
 use Upload\File;
 
-/*
-use lib\Upload;
-//是否总是上传
-Upload::$db = false;
-//是否把上传记录保存到数据库
-Upload::$db = true;
-//是否可上传
-Upload::$allow_upload = true;
-*/
+/**  
+ * use lib\Upload;
+ * //是否总是上传
+ * Upload::$db = false;
+ * //是否把上传记录保存到数据库
+ * Upload::$db = true;
+ * //是否可上传
+ * Upload::$allow_upload = true;
+ */
 
 class Upload
 {
@@ -63,10 +63,10 @@ class Upload
     /**
      * 返回参数
      */
-    public function return_params(&$model)
+    public function returnParams(&$model)
     {
         unset($_POST['file']);
-        do_action("upload", $model);
+        do_action("upload.return", $model);
         $model['post'] = $_POST ?: [];
         $model['get']  = $_GET ?: [];
         if (!$model['data']) {
@@ -124,10 +124,9 @@ class Upload
         if (self::$db) {
             $f  = db_get_one('upload', '*', ['hash' => $md5]);
             if ($f) {
-                $f['local_path'] = PATH . $f['url'];
                 //上传成功后
-                do_action("upload.after", $f);
-                $this->return_params($f);
+                do_action("upload.success", $f);
+                $this->returnParams($f);
                 return $f;
             }
         }
@@ -149,10 +148,9 @@ class Upload
             } else {
                 $f = $insert;
             }
-            $this->return_params($f);
-            $f['local_path'] = PATH . $url;
+            $this->returnParams($f);
             //上传成功后
-            do_action("upload.after", $f);
+            do_action("upload.success", $f);
             return $f;
         } catch (\Exception $e) {
             $errors = $file->getErrors();
@@ -164,7 +162,10 @@ class Upload
      */
     public static function getSize()
     {
-        $size = db_get_sum("upload", "size");
+        $size = db_get_sum("upload", "size") ?: 0;
+        if ($size <= 0) {
+            return 0;
+        }
         return bcdiv($size, bcmul(1024, 1024), 2);
     }
 }

@@ -59,7 +59,6 @@ function global_trim_inner(&$in)
         }
     }
 }
-global_trim();
 /**
  * 取GET
  */

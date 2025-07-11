@@ -6,7 +6,6 @@ namespace lib;
  * https://github.com/vlucas/valitron 
  */
 
-use Valitron\Validator;
 
 /**
  * 
@@ -14,7 +13,7 @@ use Valitron\Validator;
  * lib\Validate::lang($lang);
  * lib\Validate::langDir(__DIR__.'/validator_lang');
  */
-class Validate extends Validator
+class Validate extends \Valitron\Validator
 {
 
     public function errors($field = null)
@@ -25,14 +24,3 @@ class Validate extends Validator
         return $this->_errors;
     }
 }
-
-/**
- * 添加简单手机号验证 
- */
-\Valitron\Validator::addRule('phonech', function ($field, $value, array $params, array $fields) {
-    if (preg_match('/^1\d{10}$/', $value)) {
-        return true;
-    } else {
-        return false;
-    }
-}, '格式错误');

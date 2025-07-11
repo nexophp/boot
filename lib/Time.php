@@ -8,7 +8,7 @@ class Time
      * 取每月
      * every_month('2023-01-01','2023-12-31')
      */
-    public static function every_month($start_month, $end_month)
+    public static function everyMonth($start_month, $end_month)
     {
         $list = [];
         while ($start_month < $end_month) {
@@ -34,7 +34,7 @@ class Time
      * 计算时间剩余
      * @return string ２天３小时２８分钟１０秒
      */
-    public static function less_time($a, $b = null)
+    public static function lessTime($a, $b = null)
     {
         if (!$b) {
             $time = $a;
@@ -69,7 +69,7 @@ class Time
     /**
      * 最近几天
      */
-    public static function neer_days($num = 5, $separate = "", $op = '-')
+    public static function neerDays($num = 5, $separate = "", $op = '-')
     {
         $list  = [];
         for ($i = 0; $i < $num; $i++) {
@@ -85,7 +85,7 @@ class Time
     /**
      * 返回最近几月
      */
-    public static function neer_months($num = 5, $separate = "", $op = '-')
+    public static function neerMonths($num = 5, $separate = "", $op = '-')
     {
         $list  = [];
         for ($i = 0; $i < $num; $i++) {
@@ -101,7 +101,7 @@ class Time
     /**
      * 返回最近几年
      */
-    public static function neer_years($num = 5, $op = '-')
+    public static function neerYears($num = 5, $op = '-')
     {
         if ($op == '-') {
             $start = date("Y", strtotime($op . ($num - 1) . " year", time()));

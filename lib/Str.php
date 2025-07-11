@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace lib;
+
 use Ramsey\Uuid\Uuid;
 
 class Str
@@ -8,58 +10,60 @@ class Str
 	 * 生成UUID
 	 * https://uuid.ramsey.dev/en/stable/quickstart.html#using-ramsey-uuid
 	 */
-	public static function uuid($int=4){
-		if(is_numeric($int)){
-			$met = "uuid".$int;	
-		}else{
+	public static function uuid($int = 4)
+	{
+		if (is_numeric($int)) {
+			$met = "uuid" . $int;
+		} else {
 			$met = $int;
-		}		
+		}
 		return Uuid::$met()->toString();
 	}
 	/**
-	* 使用Sonyflake生成唯一值，确保并发时生成唯一ID,最长可用174年
-	* $id = \lib\Str::sony_flake_id();
-	* 如果需要不同的sequence，可传值\lib\Str::sony_flake_id($center_id=0,$work_id=1);
-	* config.ini.php
-	* $config['redis'] = [
-	* 	'host'=>'',
-	* 	'port'=>'',
-	* 	'auth'=>'', 
-	* ];
-	* 
-	* $config['sony_flake'] = [ 
-	* 	'from_date'=>'2022-10-27',
-	* ];
-	* https://github.com/godruoyi/php-snowflake
-	*/
-	public static function sony_flake_id($center_id=0,$work_id=0){
+	 * 使用Sonyflake生成唯一值，确保并发时生成唯一ID,最长可用174年
+	 * $id = \lib\Str::sony_flake_id();
+	 * 如果需要不同的sequence，可传值\lib\Str::sony_flake_id($center_id=0,$work_id=1);
+	 * config.ini.php
+	 * $config['redis'] = [
+	 * 	'host'=>'',
+	 * 	'port'=>'',
+	 * 	'auth'=>'', 
+	 * ];
+	 * 
+	 * $config['sony_flake'] = [ 
+	 * 	'from_date'=>'2022-10-27',
+	 * ];
+	 * https://github.com/godruoyi/php-snowflake
+	 */
+	public static function sony_flake_id($center_id = 0, $work_id = 0)
+	{
 		global $config;
 		global $snowflake_obj;
-		$key = $center_id.$work_id;
-		if(!$snowflake_obj[$key]){
+		$key = $center_id . $work_id;
+		if (!$snowflake_obj[$key]) {
 			$redis_config = $config['redis'];
 			$sony_flake  = $config['sony_flake'];
-			$start_date  = $sony_flake['from_date']?:"2022-10-27"; 
-			$redis = new \Redis(); 
-			$redis->connect($redis_config['host'], $redis_config['port']); 
-			if($redis_config['auth']){
-				$redis->auth($redis_config['auth']);	
-			}		
+			$start_date  = $sony_flake['from_date'] ?: "2022-10-27";
+			$redis = new \Redis();
+			$redis->connect($redis_config['host'], $redis_config['port']);
+			if ($redis_config['auth']) {
+				$redis->auth($redis_config['auth']);
+			}
 			$snowflake = new \Godruoyi\Snowflake\Sonyflake($center_id, $work_id);
-			$snowflake->setStartTimeStamp(strtotime(date($start_date))*1000)
-			        ->setSequenceResolver(new \Godruoyi\Snowflake\RedisSequenceResolver($redis));
+			$snowflake->setStartTimeStamp(strtotime(date($start_date)) * 1000)
+				->setSequenceResolver(new \Godruoyi\Snowflake\RedisSequenceResolver($redis));
 			$snowflake_obj[$key] = $snowflake;
-		} 
-		$id = $snowflake_obj[$key]->id(); 
+		}
+		$id = $snowflake_obj[$key]->id();
 		return $id;
-	}	
+	}
 	/**
-	* 生成订单号,唯一的
-	* $id = \lib\Str::order_id('SP'); 
-	*/
-	public static function order_id($prefix = '',$center_id=0,$work_id=0)
+	 * 生成订单号,唯一的
+	 * $id = \lib\Str::order_id('SP'); 
+	 */
+	public static function orderId($prefix = '', $center_id = 0, $work_id = 0)
 	{
-		return $prefix . date('YmdHi') .self::sony_flake_id($center_id,$work_id);
+		return $prefix . date('YmdHi') . self::sony_flake_id($center_id, $work_id);
 	}
 	/**
 	 * 500m 1km
@@ -100,7 +104,7 @@ class Str
 	 * @param   $small_timestamp 自定义时间戳，小于当前时间戳
 	 * @return array ２天３小时２８分钟１０秒 
 	 */
-	public static function less_time($timestamp, $small_timestamp = null)
+	public static function lessTime($timestamp, $small_timestamp = null)
 	{
 		if (!$small_timestamp) $time = $timestamp;
 		else $time = $timestamp - $small_timestamp;
@@ -133,7 +137,7 @@ class Str
 	 * @param string $to 　
 	 * @return string
 	 */
-	public static function size_to($size, $to = 'GB')
+	public static function sizeTo($size, $to = 'GB')
 	{
 		$size = strtoupper($size);
 		$to = strtoupper($to);
@@ -160,7 +164,7 @@ class Str
 	 * @param string $j 位数 　 
 	 * @return int
 	 */
-	public static function rand_number($j = 4)
+	public static function randNumber($j = 4)
 	{
 		$str = null;
 		for ($i = 0; $i < $j; $i++) {
@@ -200,7 +204,7 @@ class Str
 	 * @param  int $length 截取长度
 	 * @return string
 	 */
-	public static function cut($string, $length,$append = '')
+	public static function cut($string, $length, $append = '')
 	{
 		$new_str = '';
 		preg_match_all("/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xef][\x80-\xbf][\x80-\xbf]|\xf0[\x90-\xbf][\x80-\xbf][\x80-\xbf]|[\xf1-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf]/", $string, $info);

@@ -1,11 +1,12 @@
 <?php
 
 namespace lib;
-/*
-tx_map_key
-gd_map_key
-bd_map_key
-*/
+
+/**
+ * tx_map_key
+ * gd_map_key
+ * bd_map_key
+ */
 
 class Map
 {
@@ -26,7 +27,8 @@ class Map
      * @param  [type] $address [description]
      * @return [type]          [description]
      */
-    public static function tx($address, $lat = true)
+    public static function getTxByAddress($address, $lat = true)
+
     {
         $key     = get_config('tx_map_key');
         $address = urlencode($address);
@@ -47,7 +49,7 @@ class Map
      * @param  boolean $full [description]
      * @return [type]        [description]
      */
-    public static function tx_lat($lat, $lng, $full = false)
+    public static function getTxByLat($lat, $lng, $full = false)
     {
         $key     = get_config('tx_map_key');
         $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=" . $lat . ',' . $lng . "&key=" . $key;
@@ -64,7 +66,8 @@ class Map
      * @param  boolean $show_full [description]
      * @return [type]             [description]
      */
-    public static function gaode($address, $show_full = false)
+    public static function getGaodeByAddress($address, $show_full = false)
+
     {
         $key     = get_config('gd_map_key');
         $address = urlencode($address);
@@ -80,13 +83,15 @@ class Map
         }
     }
     /**
-     * 通过经纬度取城市 $log.','.$lat
-     * @param  [type]  $address   [description]
+     * 通过经纬度取城市   
+     * @param  [type]  $lat  [description]
+     * @param  [type]  $lng  [description]
      * @param  boolean $show_full [description]
      * @return [type]             [description]
      */
-    public static function gaode_lat($location, $show_full = false)
+    public static function getGaodeByLat($lat, $lng, $show_full = false)
     {
+        $location = $lng . ',' . $lat;
         $key     = get_config('gd_map_key');
         $url = 'https://restapi.amap.com/v3/geocode/regeo?location=' . $location . '&output=json&key=' . $key;
         $res = self::get_request($url);
@@ -99,11 +104,16 @@ class Map
             return $c;
         }
     }
-
-    public static function baidu_ip($ip, $show_full = false)
+    /**
+     * 百度地图
+     * @param  [type]  $ip        [description]
+     * @param  boolean $show_full [description]
+     * @return [type]             [description]
+     */
+    public static function getBaiduByIp($ip, $show_full = false)
     {
         $key     = get_config('bd_map_key');
-        $url = 'https://api.map.baidu.com/location/ip?ak=' . $ak . '&ip=' . $ip . '&coor=bd09ll';
+        $url = 'https://api.map.baidu.com/location/ip?ak=' . $key . '&ip=' . $ip . '&coor=bd09ll';
         $res = self::get_request($url);
         $res = json_decode($res, true);
         if ($show_full) {
@@ -125,7 +135,7 @@ class Map
      * @param  Int     $decimal    精度 保留小数位数
      * @return Decimal
      */
-    public static function get_distance($longitude1, $latitude1, $longitude2, $latitude2, $unit = 2, $decimal = 2)
+    public static function getDistance($longitude1, $latitude1, $longitude2, $latitude2, $unit = 2, $decimal = 2)
     {
         return get_distance($longitude1, $latitude1, $longitude2, $latitude2, $unit, $decimal);
     }
