@@ -19,8 +19,7 @@
         "phpseclib/phpseclib": "^2",
         "phpoffice/phpspreadsheet": "^1",
         "spatie/array-to-xml": "^2",
-        "ramsey/uuid": "^4",
-        "endroid/qr-code": "^4",
+        "ramsey/uuid": "^4", 
         "erusev/parsedown": "^1",
         "intervention/image": "^3",
         "alchemy/zippy": "^1",
@@ -32,7 +31,8 @@
         "predis/predis": "^2",
         "voku/anti-xss": "^4",
         "picqer/php-barcode-generator": "^2",
-        "vlucas/valitron": "*"
+        "vlucas/valitron": "*",
+        "endroid/qr-code": "*"
     },
     "psr-0": {
         "Upload": "./composer/codeguy/upload/src/"
