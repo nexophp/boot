@@ -1,0 +1,6 @@
+/vendor
+/composer.lock
+/install/lock 
+/config.ini.php
+/nginx.htaccess
+/.htaccess
