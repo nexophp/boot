@@ -11,11 +11,12 @@ if (!defined('DEBUG')) define('DEBUG', true);
 /**
  * 项目路径
  */
-if (!defined('PATH')) define('PATH', realpath(__DIR__ . '/../../../') . '/');
+if (!defined('PATH')) define('PATH', realpath(__DIR__ . '/../../..'));
+if (!defined('WWW_PATH')) define('WWW_PATH', PATH . '/public');
 /**
  * 框架路径
  */
-if (!defined('NexoPHP_PATH')) define('NexoPHP_PATH', realpath(PATH . 'vendor/nexophp') . '/');
+if (!defined('NEXOPHP_PATH')) define('NEXOPHP_PATH', realpath(PATH . '/vendor/nexophp'));
 /**
  * 错误提示 
  */
@@ -23,7 +24,7 @@ if (DEBUG) {
   ini_set('display_errors', 'on');
   //error_log() 函数，记录具体错误
   error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_WARNING);
-  ini_set('error_log', PATH . 'runtime/phplog.log');
+  ini_set('error_log', PATH . '/runtime/phplog.log');
 } else {
   ini_set('display_errors', 'off');
   error_reporting(0);
@@ -31,23 +32,22 @@ if (DEBUG) {
 /**
  * 数据库配置
  */
-include PATH . 'config.ini.php';
+require PATH . '/config.ini.php';
 /**
  * 启动数据库连接
  */
-include NexoPHP_PATH . 'db/boot.php';
+require NEXOPHP_PATH . '/db/boot.php';
 /**
  * 加载autoload
  */
 global $autoload;
-if (!$autoload) {
-  $autoload = include PATH . 'vendor/autoload.php';
-}
-$autoload->addPsr4('app\\', PATH . 'app/');
-$autoload->addPsr4('modules\\', PATH . 'modules/');
-include __DIR__ . '/inc/function.php';
-include __DIR__ . '/inc/jwt.php';
-include __DIR__ . '/inc/request.php';
+$autoload = require PATH . '/vendor/autoload.php';
+$autoload->addPsr4('app\\', PATH . '/app/');
+$autoload->addPsr4('modules\\', PATH . '/modules/');
+require __DIR__ . '/inc/addon.php';
+require __DIR__ . '/inc/function.php';
+require __DIR__ . '/inc/jwt.php';
+require __DIR__ . '/inc/request.php';
 /**
  * TRIM
  */
@@ -71,6 +71,22 @@ add_action("header", function () {
 add_action("footer", function () {
   render_js();
 });
+/**
+ * 应用初始化
+ */
+do_action("app.init");
+/**
+ * 路由首页
+ */
+IRoute::all('/', function () {
+  /**
+   * 首页
+   */
+  do_action("index");
+});
+/**
+ * 执行路由
+ */
 return IRoute::do(function () {
   /**
    * 路由后
