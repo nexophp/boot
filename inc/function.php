@@ -2403,3 +2403,36 @@
         }
         return;
     }
+    /**
+     * 获取路由
+     */
+    function get_routes($show_string = true)
+    {
+        $route = IRoute::get_action();
+        if ($show_string) {
+            $module = $route['module'];
+            $controller = $route['controller'];
+            $action = $route['action'];
+            return $module . '/' . $controller . '/' . $action;
+        } else {
+            return $route;
+        }
+    }
+    /**
+     * 视图
+     */
+    function view($file, $params = [])
+    {
+        $route = get_routes();
+        $route = str_replace("/", ".", $route);
+        if ($params) {
+            extract($params);
+        }
+        $file = $file . '.php';
+        ob_start();
+        include $file;
+        $data = ob_get_clean();
+        $data = trim($data);
+        do_action("view." . $route, $data);
+        return $data;
+    }
