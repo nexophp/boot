@@ -2423,12 +2423,14 @@
      */
     function view($file, $params = [])
     {
-        $route = get_routes();
-        $route = str_replace("/", ".", $route);
+        $route = IRoute::get_action();
+        $module = $route['module'];
+        $controller = $route['controller'];
+        $action = $route['action'];
         if ($params) {
             extract($params);
         }
-        $file = $file . '.php';
+        $file = PATH . '/app/' . $module . '/view/' . $controller . '/' . $file . '.php';
         ob_start();
         include $file;
         $data = ob_get_clean();
