@@ -837,43 +837,6 @@
         }
         return false;
     }
-
-
-
-    /**
-     * 加载css
-     */
-    function css($file, $is_output = true)
-    {
-        global $_app;
-        $key = md5($file);
-        if (isset($_app['css'][$key])) {
-            return;
-        }
-        if ($is_output) {
-            echo '<link href="' . $file . '" rel="stylesheet">' . "\n";
-            $_app['css'][$key] = true;
-        } else {
-            $_app['css'][$key] = $file;
-        }
-    }
-    /**
-     * 加载 JS文件
-     */
-    function js($file, $is_output = true)
-    {
-        global $_app;
-        $key = md5($file);
-        if (isset($_app['js'][$key])) {
-            return;
-        }
-        if ($is_output) {
-            echo '<script src="' . $file . '"></script>' . "\n";
-            $_app['js'][$key] = true;
-        } else {
-            $_app['js'][md5($file)] = $file;
-        }
-    }
     /**
      * 数组转对象
      *
@@ -1866,7 +1829,13 @@
     function add_js($code)
     {
         global $_app;
-        $_app['js_code'][] = $code;
+        $code = trim($code);
+        //判断换行数量 
+        if (substr_count($code, "\n") > 1) {
+            $_app['js_code'][] = $code;
+            return;
+        }
+        $_app['css'][md5($code)] = $code;
     }
     /**
      * 输出JS
@@ -1910,7 +1879,13 @@
     function add_css($code)
     {
         global $_app;
-        $_app['css_code'][] = $code;
+        $code = trim($code);
+        //判断换行数量 
+        if (substr_count($code, "\n") > 1) {
+            $_app['css_code'][] = $code;
+            return;
+        }
+        $_app['css'][md5($code)] = $code;
     }
     /**
      * 输出JS
