@@ -7,8 +7,8 @@ use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * https://symfony.com/doc/current/components/lock.html
- * global $redis_config; 
- * $redis_config = [
+ * global $config; 
+ * $config['redis'] = [
  * 	'host'=>'',
  * 	'port'=>'',
  * 	'auth'=>'',
@@ -24,7 +24,8 @@ class Lock
 
     public static function init()
     {
-        global $redis_config;
+        global $config;
+        $redis_config = $config['redis'];
         if (self::$factory) {
             return self::$factory;
         }
