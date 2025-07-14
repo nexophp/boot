@@ -382,7 +382,7 @@
     function allow_cross_origin()
     {
         global $config;
-        $cross_origin = $config['cross_origin']?:'*';
+        $cross_origin = $config['cross_origin'] ?: '*';
         header('Access-Control-Allow-Origin: ' . $cross_origin);
         header('Access-Control-Allow-Credentials:true');
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -1833,7 +1833,7 @@
             $_app['js_code'][] = $code;
             return;
         }
-        $_app['css'][md5($code)] = $code;
+        $_app['js'][md5($code)] = $code;
     }
     /**
      * 输出JS
