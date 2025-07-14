@@ -1330,9 +1330,12 @@ function page_size($name)
  */
 function aes_encode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options = '')
 {
+    global $config;
     if (is_array($data)) {
         $data = json_encode($data);
     }
+    $key = $key?:$config['aes']['key'];
+    $iv  = $iv?:$config['aes']['iv'];
     $obj = new \lib\Aes($key, $iv, $type, $options);
     return base64_encode($obj->encrypt($data));
 }
@@ -1341,6 +1344,9 @@ function aes_encode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options 
  */
 function aes_decode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options = '')
 {
+    global $config;
+    $key = $key?:$config['aes']['key'];
+    $iv  = $iv?:$config['aes']['iv'];
     $data = base64_decode($data);
     $obj = new \lib\Aes($key, $iv, $type, $options);
     $data = $obj->decrypt($data);
