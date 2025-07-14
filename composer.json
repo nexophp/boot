@@ -35,10 +35,12 @@
         "vlucas/valitron": "^1.4",
         "endroid/qr-code": "^6.0"
     },
-    "psr-0": {
-        "Upload": "./composer/codeguy/upload/src/"
-    },
-    "psr-4": {
-        "lib\\": "./lib/"
+    "autoload": { 
+        "psr-0": {
+            "Upload": "./composer/codeguy/upload/src/"
+        },
+        "psr-4": {
+            "lib\\": "./lib/"
+        }
     }
 }
