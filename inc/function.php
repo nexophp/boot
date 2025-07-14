@@ -5,7 +5,8 @@
      */
     function predis()
     {
-        global $redis_config;
+        global $config;
+        $redis_config = $config['redis'];
         $host = $redis_config['host'];
         $port = $redis_config['port'];
         $auth = $redis_config['auth'];
