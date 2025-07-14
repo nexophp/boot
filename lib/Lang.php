@@ -22,7 +22,7 @@ class Lang
     {
         $lang = cookie('lang') ?: 'zh-cn';
         if (!self::$obj[$pre]) {
-            $file = PATH . 'lang/' . $lang . '/' . $pre . '.php';
+            $file = PATH . '/lang/' . $lang . '/' . $pre . '.php';
             if (file_exists($file)) {
                 $arr = include $file;
             }
