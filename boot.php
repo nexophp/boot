@@ -78,7 +78,7 @@ do_action("app.init");
 /**
  * 路由首页
  */
-IRoute::all('/', function () {
+Route::all('/', function () {
   /**
    * 首页
    */
@@ -87,7 +87,7 @@ IRoute::all('/', function () {
 /**
  * 执行路由
  */
-return IRoute::do(function () {
+return Route::do(function () {
   /**
    * 路由后
    */
