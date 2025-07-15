@@ -2403,3 +2403,15 @@ function get_browser_lang()
         return 'en';
     }
 }
+
+/**
+ * 查找文件
+ */
+function find_files($arr)
+{
+    foreach ($arr as $v) {
+        if (file_exists($v)) {
+            return include $v;
+        }
+    }
+}
