@@ -2415,3 +2415,11 @@ function find_files($arr)
         }
     }
 }
+/**
+ * 跳转
+ */
+function redirect($url)
+{
+    header('Location: ' . $url);
+    exit;
+}
