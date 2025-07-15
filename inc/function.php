@@ -1873,6 +1873,9 @@ function render_js_file()
     if ($all) {
         foreach ($all as $v) {
             if (is_string($v)) {
+                if (strpos($v, '://') === false) {
+                    $v = cdn() . $v;
+                }
                 echo '<script type="text/javascript" src="' . $v . '"></script>';
             }
         }
@@ -1921,6 +1924,9 @@ function render_css_file()
     if ($all) {
         foreach ($all as $v) {
             if (is_string($v)) {
+                if (strpos($v, '://') === false) {
+                    $v = cdn() . $v;
+                }
                 echo '<link href="' . $v . '" rel="stylesheet">';
             }
         }
