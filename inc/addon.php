@@ -16,7 +16,7 @@ function view($file, $params = [])
     include $file;
     $data = ob_get_clean();
     $data = trim($data);
-    do_action("view." . $route, $data);
+    do_action("view." . $module.'.'.$controller.'.'.$action, $data);
     return $data;
 }
 /**
