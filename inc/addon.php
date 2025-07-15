@@ -38,7 +38,7 @@ function view_header($title)
 </head>
 
 <body>
-    <div id='app'>
+    <div id='app' v-cloak>
         <?php
     }
     /**
