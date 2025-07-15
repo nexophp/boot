@@ -13,11 +13,14 @@ function view($file, $params = [])
     }
     $files = [];
     $files[] = PATH . '/app/' . $module . '/view/' . $controller . '/' . $file . '.php'; 
+    $files[] = PATH . '/app/' . $module . '/view/' . $file . '.php'; 
     $files[] = PATH . '/modules/' . $module . '/view/' . $controller . '/' . $file . '.php'; 
+    $files[] = PATH . '/modules/' . $module . '/view/' . $file . '.php'; 
     try { 
         $composer_module_path = db_get_one("module","path",['name'=>$module]); 
         if($composer_module_path){
             $files[] = PATH . $composer_module_path . '/view/' . $controller . '/' . $file . '.php';
+            $files[] = PATH . $composer_module_path . '/view/' . $file . '.php';
         }
     } catch (\Throwable $th) {
         
