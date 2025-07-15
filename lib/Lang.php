@@ -18,19 +18,32 @@ class Lang
         self::$lang_dir = PATH . 'lang/' . $name . '/';
     }
 
-    public static function trans($name, $val = [], $pre = 'app')
+    public static function trans($name, $val = [], $file_name = 'app')
     {
+        $data = [
+            'name' => $name,
+            'value' => $val,
+            'file_name' => $file_name,
+        ];
+        /**
+         * 语言翻译
+         */
+        do_action('lang', $data);
+        $ret = $data['return'] ?? '';
+        if ($ret) {
+            return $ret;
+        }
         $lang = cookie('lang') ?: 'zh-cn';
-        if (!self::$obj[$pre]) {
+        if (!self::$obj[$file_name]) {
             $route = \Route::getActions();
             $module = $route['module'];
             $files = [];
-            $files[] = PATH . '/app/' . $module . '/lang/' . $lang . '/' . $pre . '.php';
-            $files[] = PATH . '/lang/' . $lang . '/' . $pre . '.php';
+            $files[] = PATH . '/app/' . $module . '/lang/' . $lang . '/' . $file_name . '.php';
+            $files[] = PATH . '/lang/' . $lang . '/' . $file_name . '.php';
             $arr = find_files($files);
-            self::$obj[$pre] = $arr;
+            self::$obj[$file_name] = $arr;
         }
-        $output =  self::$obj[$pre][$name];
+        $output =  self::$obj[$file_name][$name];
         if ($val) {
             foreach ($val as $k => $v) {
                 $output = str_replace("{" . $k . "}", $v, $output);
