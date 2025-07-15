@@ -1334,8 +1334,8 @@ function aes_encode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options 
     if (is_array($data)) {
         $data = json_encode($data);
     }
-    $key = $key?:$config['aes']['key'];
-    $iv  = $iv?:$config['aes']['iv'];
+    $key = $key ?: $config['aes']['key'];
+    $iv  = $iv ?: $config['aes']['iv'];
     $obj = new \lib\Aes($key, $iv, $type, $options);
     return base64_encode($obj->encrypt($data));
 }
@@ -1345,8 +1345,8 @@ function aes_encode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options 
 function aes_decode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options = '')
 {
     global $config;
-    $key = $key?:$config['aes']['key'];
-    $iv  = $iv?:$config['aes']['iv'];
+    $key = $key ?: $config['aes']['key'];
+    $iv  = $iv ?: $config['aes']['iv'];
     $data = base64_decode($data);
     $obj = new \lib\Aes($key, $iv, $type, $options);
     $data = $obj->decrypt($data);
@@ -2382,4 +2382,18 @@ function array_order_by()
         return array_pop($args);
     }
     return;
+}
+
+/**
+ * 取浏览器当前语言
+ */
+function get_browser_lang()
+{
+    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        $firstLang = explode(';', $langs[0])[0]; // 获取第一个语言代码
+        return strtolower($firstLang); // 转换为全小写 
+    } else {
+        return 'en';
+    }
 }
