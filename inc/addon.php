@@ -11,9 +11,19 @@ function view($file, $params = [])
     if ($params) {
         extract($params);
     }
-    $file = PATH . '/app/' . $module . '/view/' . $controller . '/' . $file . '.php';
+    $files = [];
+    $files[] = PATH . '/app/' . $module . '/view/' . $controller . '/' . $file . '.php'; 
+    $files[] = PATH . '/modules/' . $module . '/view/' . $controller . '/' . $file . '.php'; 
+    try { 
+        $composer_module_path = db_get_one("module","path",['name'=>$module]); 
+        if($composer_module_path){
+            $files[] = PATH . $composer_module_path . '/view/' . $controller . '/' . $file . '.php';
+        }
+    } catch (\Throwable $th) {
+        
+    }
     ob_start();
-    include $file;
+    find_files($files);
     $data = ob_get_clean();
     $data = trim($data);
     do_action("view." . $module.'.'.$controller.'.'.$action, $data);
