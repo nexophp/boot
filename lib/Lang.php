@@ -22,10 +22,12 @@ class Lang
     {
         $lang = cookie('lang') ?: 'zh-cn';
         if (!self::$obj[$pre]) {
-            $file = PATH . '/lang/' . $lang . '/' . $pre . '.php';
-            if (file_exists($file)) {
-                $arr = include $file;
-            }
+            $route = \Route::getActions();
+            $module = $route['module'];
+            $files = [];
+            $files[] = PATH . '/app/' . $module . '/lang/' . $lang . '/' . $pre . '.php';
+            $files[] = PATH . '/lang/' . $lang . '/' . $pre . '.php';
+            $arr = find_files($files);
             self::$obj[$pre] = $arr;
         }
         $output =  self::$obj[$pre][$name];
