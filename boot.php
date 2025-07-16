@@ -75,15 +75,10 @@ add_action("footer", function () {
  * 应用初始化
  */
 do_action("app.init");
-/**
- * 路由首页
- */
-Route::all('/', function () {
-  /**
-   * 首页
-   */
-  do_action("index");
-});
+$app_file = PATH.'/app.php';
+if(file_exists($app_file)){
+  include $app_file;
+}
 /**
  * 执行路由
  */
