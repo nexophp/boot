@@ -75,9 +75,17 @@ add_action("footer", function () {
  * 应用初始化
  */
 do_action("app.init");
-$app_file = PATH.'/app.php';
-if(file_exists($app_file)){
-  include $app_file;
+/**
+ * 加载依赖数据库的功能
+ * 如模块
+ */
+require __DIR__ . '/inc/db.php';
+/**
+ * 加载项目自己的include文件
+ */
+$include_file = PATH.'/include.php';
+if(file_exists($include_file)){
+  include $include_file;
 }
 /**
  * 执行路由
