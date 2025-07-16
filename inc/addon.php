@@ -7,10 +7,7 @@ function view($file, $params = [])
     $route = Route::getActions();
     $module = $route['module'];
     $controller = $route['controller'];
-    $action = $route['action'];
-    if ($params) {
-        extract($params);
-    }
+    $action = $route['action']; 
     $files = [];
     $files[] = PATH . '/app/' . $module . '/view/' . $controller . '/' . $file . '.php'; 
     $files[] = PATH . '/app/' . $module . '/view/' . $file . '.php'; 
@@ -25,8 +22,15 @@ function view($file, $params = [])
     } catch (\Throwable $th) {
         
     }
+    $fined_file = find_files($files,true);
+    if(!$fined_file){ 
+        return false;
+    }
+    if ($params) {
+        extract($params);
+    }
     ob_start();
-    find_files($files);
+    include $fined_file;
     $data = ob_get_clean();
     $data = trim($data);
     do_action("view." . $module.'.'.$controller.'.'.$action, $data);

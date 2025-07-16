@@ -2407,10 +2407,13 @@ function get_browser_lang()
 /**
  * 查找文件
  */
-function find_files($arr)
+function find_files($arr,$return_file = false )
 {
     foreach ($arr as $v) {
         if (file_exists($v)) {
+            if($return_file){
+                return $v;
+            }
             return include $v;
         }
     }
