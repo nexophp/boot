@@ -2423,3 +2423,20 @@ function redirect($url)
     header('Location: ' . $url);
     exit;
 }
+/**
+ * 应用容器 - 支持带参数的类实例化
+ * @param string $class_name 类名
+ * @param array $params 构造参数
+ * @return object 类实例
+ */
+function app($class_name, $params = [])
+{
+    static $app = [];
+    // 生成带参数的唯一键
+    $key = md5($class_name . serialize($params));
+    if (!isset($app[$key])) {
+        // 支持带参数实例化
+        $app[$key] = new $class_name(...(array)$params);
+    }
+    return $app[$key];
+}
