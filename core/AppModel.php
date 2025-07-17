@@ -1,5 +1,7 @@
 <?php
+
 namespace core;
+
 /**
  * 基础模型
  * @author sunkangchina <68103403@qq.com>

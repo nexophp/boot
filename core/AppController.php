@@ -1,5 +1,7 @@
 <?php
+
 namespace core;
+
 /**
  * 基础控制器
  * @author sunkangchina <68103403@qq.com>
@@ -84,9 +86,9 @@ class AppController
     {
         $action = $this->actions['action'];
         if (!$data) {
-            $data = view($action, $this->view_data); 
+            $data = view($action, $this->view_data);
         }
-    } 
+    }
     /**
      * 加载资源文件
      */

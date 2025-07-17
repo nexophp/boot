@@ -1,5 +1,7 @@
 <?php
+
 namespace core;
+
 /**
  * API控制器
  * @author sunkangchina <68103403@qq.com>

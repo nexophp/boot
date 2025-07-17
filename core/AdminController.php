@@ -1,5 +1,7 @@
 <?php
+
 namespace core;
+
 /**
  * 平台管理员基础控制器
  * @author sunkangchina <68103403@qq.com>
@@ -38,11 +40,12 @@ class AdminController extends AppController
     /**
      * 设置侧边栏
      */
-    protected function setSdebar(){
+    protected function setSdebar()
+    {
         $menu_bg = get_config('menu_bg');
-        $menu_active = get_config('menu_active'); 
+        $menu_active = get_config('menu_active');
         $menu_color_active = get_config('menu_color_active');
-        if($menu_bg && $menu_active){
+        if ($menu_bg && $menu_active) {
             add_action('header', function () use ($menu_bg, $menu_active, $menu_color_active) {
                 echo <<<HTML
 <style>
