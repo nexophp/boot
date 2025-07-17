@@ -2450,3 +2450,23 @@ function app($class_name, $params = [])
     }
     return $app[$key];
 }
+/**
+ * 生成URL
+ */
+function url($url,$par = []){
+    $url = create_new_url($url);
+    return Route:: url($url, $par);
+}
+
+/**
+ * 生成URL 
+ */
+function create_new_url($url){
+    $slashCount = substr_count($url, '/');
+    if($slashCount == 2){
+        $url = $url.'/index';
+    }else if($slashCount == 1){
+        $url = $url.'/site/index';
+    } 
+    return $url;
+}
