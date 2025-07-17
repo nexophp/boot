@@ -1,6 +1,35 @@
 <?php 
 
 /**
+ * 判断是否有权限
+ */
+function has_access($str){
+    $uid = cookie('uid');
+    if(!$uid){
+        return false;
+    }
+    //超管不用判断权限
+    if($uid == 1){
+        return true;
+    }
+    $role_id = db_get("user_role","role_id",['user_id'=>$uid]);
+    if($role_id){ 
+        $roles = db_get("role","*",['id'=>$role_id]);
+        $permissions = [];
+        if($roles){
+            foreach($roles as $v){
+                $permissions = array_merge($permissions,$v['permissions'] ?? []); 
+            }
+        }
+        if($permissions){ 
+            if(in_array($str,$permissions)){
+                return true;
+            }
+        } 
+    } 
+}
+
+/**
  * 包含已安装的模块
  */
 include_installed_modules();
