@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * 字符串类
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
 namespace lib;
 
 use Ramsey\Uuid\Uuid;

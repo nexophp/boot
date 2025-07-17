@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * 上传类
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
 namespace lib;
 
 use Upload\Storage\FileSystem;
@@ -104,7 +111,7 @@ class Upload
         $user_id = $this->user_id ?: $user_id;
         $url =  $this->base_dir . '/' . $this->domain . '/' . $sub_dir . $user_id . '/' . date('Ymd');
         $url = str_replace("//", "/", $url);
-        $path  = WWW_PATH .'/'. $url . '/';
+        $path  = WWW_PATH . '/' . $url . '/';
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }

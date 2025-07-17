@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * 常用函数
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
+/**
  * redis
  */
 function predis()
@@ -2407,11 +2414,11 @@ function get_browser_lang()
 /**
  * 查找文件
  */
-function find_files($arr,$return_file = false )
+function find_files($arr, $return_file = false)
 {
     foreach ($arr as $v) {
         if (file_exists($v)) {
-            if($return_file){
+            if ($return_file) {
                 return $v;
             }
             return include $v;

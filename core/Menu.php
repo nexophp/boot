@@ -1,12 +1,13 @@
 <?php
 
-namespace core;
-
 /**
  * 菜单数据库操作类
  * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
  * @date 2025
  */
+
+namespace core;
 
 class Menu extends AppModel
 {

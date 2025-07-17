@@ -3,6 +3,7 @@
 /**
  * 权限管理类
  * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
  * @date 2025
  */
 
@@ -18,7 +19,7 @@ class Permission
     /**
      * 必须是继承了哪些类
      */
-    public $hasExtendsClasses = [ 
+    public $hasExtendsClasses = [
         '\core\AdminController'
     ];
 

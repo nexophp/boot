@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * JWT 
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
 use Firebase\JWT\JWT as Firebase_JWT;
 
 /**
@@ -9,14 +17,14 @@ function api($show_error = true)
 {
 	static $api_data;
 	if (!$api_data) {
-		if(cookie('uid')){
+		if (cookie('uid')) {
 			$user = get_user(cookie('uid'));
 			$user['user_id'] = $user['id'];
 			$api_data = $user;
 		}
-		if(!$api_data){
-			$api_data = get_author(null, false, $show_error);		
-		}				
+		if (!$api_data) {
+			$api_data = get_author(null, false, $show_error);
+		}
 	}
 	return $api_data;
 }
@@ -26,7 +34,7 @@ function api($show_error = true)
 function api_admin()
 {
 	$arr = api();
-	if (!$arr['is_admin']) {
+	if ($arr['tag'] != 'admin') {
 		json_error(['msg' => lang('Access Deny')]);
 	}
 }
@@ -46,29 +54,29 @@ function get_author($sign = null, $ignore_time_check = false, $show_error = true
 	}
 	$key = $config['jwt_key'];
 	if (!$key) {
-		$error = lang('AUTHORIZATION FAILED');
+		$error = lang('auth_key_error');
 	}
 	if (g('sign')) {
 		$sign = g('sign');
 	}
 	$jwt  = Jwt::decode($sign);
 	if (!$jwt->time) {
-		$error = lang('AUTHORIZATION FAILED');
+		$error = lang('auth_key_error');
 	}
 	$exp = $config['jwt_exp_time'];
 	if ($exp <= 0) {
 		$exp = 3600;
 	}
 	if (!$ignore_time_check && $jwt->time + $exp < time()) {
-		$error = lang('Request Expired');
+		$error = lang('auth_exp_error');
 	}
 	if ($jwt->user_id) {
 	} else {
-		$error = lang('User Not Logined');
+		$error = lang('auth_user_error');
 	}
 	if ($error) {
 		if ($show_error) {
-			json_error(['code' => 205, 'msg' => $error]);
+			json_error(['msg' => $error]);
 		}
 	}
 	return (array)$jwt;

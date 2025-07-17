@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * 请求
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+/**
  * 添加xss过滤
  */
 function get_xss_clean_ins()

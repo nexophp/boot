@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * 分页类
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
+
+/**
  *  分页 
  *  类似淘宝分页
  *  　　 

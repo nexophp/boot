@@ -1,12 +1,15 @@
 <?php
 
-namespace core;
-
 /**
  * 平台管理员基础控制器
  * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
  * @date 2025
  */
+
+namespace core;
+
+
 class AdminController extends AppController
 {
     /**

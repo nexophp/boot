@@ -1,14 +1,17 @@
 <?php
 
+/**
+ * 基础控制器
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
 namespace core;
 
 use Route;
 
-/**
- * 基础控制器
- * @author sunkangchina <68103403@qq.com>
- * @date 2025
- */
+
 class AppController
 {
     /**
@@ -44,20 +47,21 @@ class AppController
     /**
      * 请求方法前
      */
-    public function before(){
+    public function before()
+    {
         return $this->checkPermissions();
     }
     /**
      * 取当前用户权限 
      */
     public function checkPermissions()
-    { 
-        $str = $this->actions['module'].'/'.$this->actions['controller'].'/'.$this->actions['action'];
-        if(has_access($str)){
+    {
+        $str = $this->actions['module'] . '/' . $this->actions['controller'] . '/' . $this->actions['action'];
+        if (has_access($str)) {
             return true;
-        }else{
+        } else {
             do_action('access_deny');
-            json_error(['msg'=>'您没有权限访问']);
+            json_error(['msg' => '您没有权限访问']);
         }
     }
     /**

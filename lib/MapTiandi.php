@@ -1,8 +1,16 @@
 <?php
+
 /**
-* 天地图
-* http://lbs.tianditu.gov.cn/server/search2.html
-*/
+ * 天地图
+ * @author sunkangchina <68103403@qq.com>
+ * @license MIT <https://mit-license.org/>
+ * @date 2025
+ */
+
+/** 
+ * http://lbs.tianditu.gov.cn/server/search2.html
+ */
+
 namespace lib;
 
 /**
@@ -11,15 +19,15 @@ namespace lib;
 class MapTiandi
 {
     /**
-    * 服务器端
-    */
+     * 服务器端
+     */
     public static function get_tk()
     {
         return get_config("tianditu");
     }
     /**
-    * 浏览器端
-    */
+     * 浏览器端
+     */
     public static function get_tk_sever()
     {
         return get_config("tianditu_js");
@@ -33,13 +41,13 @@ class MapTiandi
         return json_decode($body, true);
     }
     /**
-    * 根据lat lng取地址
-    */
+     * 根据lat lng取地址
+     */
     public static function get_address($lat, $lng)
     {
-        $url = "http://api.tianditu.gov.cn/geocoder?postStr={'lon':".$lng.",'lat':".$lat.",'ver':1}&type=geocode&tk=".self::get_tk();
+        $url = "http://api.tianditu.gov.cn/geocoder?postStr={'lon':" . $lng . ",'lat':" . $lat . ",'ver':1}&type=geocode&tk=" . self::get_tk();
         $data = self::get($url);
-        if($data['status'] == 0) {
+        if ($data['status'] == 0) {
             $res = $data['result'];
             $list = [];
             $list['address'] = $res['formatted_address'];
@@ -52,16 +60,15 @@ class MapTiandi
             ];
             return $list;
         }
-
     }
     /**
-    * 根据地址取lat lng
-    */
+     * 根据地址取lat lng
+     */
     public static function get_lat($address)
     {
-        $url = 'http://api.tianditu.gov.cn/geocoder?ds={"keyWord":"'.$address.'"}&tk='.self::get_tk();
+        $url = 'http://api.tianditu.gov.cn/geocoder?ds={"keyWord":"' . $address . '"}&tk=' . self::get_tk();
         $data = self::get($url);
-        if($data['status'] == 0) {
+        if ($data['status'] == 0) {
             $lat = $data['location']['lat'];
             $lng = $data['location']['lon'];
             return self::wgs84_gcj02($lat, $lng);
@@ -69,8 +76,8 @@ class MapTiandi
     }
 
     /**
-    * 不转换坐标
-    */
+     * 不转换坐标
+     */
     public static function none($lat, $lng)
     {
         return self::output($lat, $lng);
@@ -104,8 +111,8 @@ class MapTiandi
     public static function output($lat, $lng)
     {
         return [
-           'lat' => round($lat, 6),
-           'lng' => round($lng, 6),
+            'lat' => round($lat, 6),
+            'lng' => round($lng, 6),
         ];
     }
 
@@ -138,5 +145,4 @@ class MapTiandi
         }
         return false;
     }
-
 }
