@@ -18,8 +18,7 @@ class Permission
     /**
      * 必须是继承了哪些类
      */
-    public static $hasExtendsClasses = [
-        '\core\AppController',
+    public $hasExtendsClasses = [ 
         '\core\AdminController'
     ];
 
@@ -113,7 +112,7 @@ class Permission
             $className = $namespace . '\\' . basename($filePath, '.php');
             //需要判断 是否有 self::$hasExtendsClasses 
             $flag = false;
-            foreach (self::$hasExtendsClasses as $v) {
+            foreach ($this->hasExtendsClasses as $v) {
                 if (strpos($content, $v) !== false) {
                     $flag = true;
                     break;
