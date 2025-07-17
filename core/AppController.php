@@ -2,6 +2,8 @@
 
 namespace core;
 
+use Route;
+
 /**
  * 基础控制器
  * @author sunkangchina <68103403@qq.com>

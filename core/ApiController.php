@@ -8,7 +8,6 @@ namespace core;
  * @date 2025
  */
 class ApiController extends AppController
-
 {
 
     public function init() {}
