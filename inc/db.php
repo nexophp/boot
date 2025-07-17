@@ -16,6 +16,12 @@ function has_access($str)
     if (!$uid) {
         return false;
     }
+    if (!$str) {
+        return false;
+    }
+    if (substr($str, 0, 1) == '/') {
+        $str = substr($str, 1);
+    }
     //超管不用判断权限
     if ($uid == 1) {
         return true;
