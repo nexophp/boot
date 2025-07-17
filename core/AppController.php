@@ -42,6 +42,25 @@ class AppController
         $this->init();
     }
     /**
+     * 请求方法前
+     */
+    public function before(){
+        return $this->checkPermissions();
+    }
+    /**
+     * 取当前用户权限 
+     */
+    public function checkPermissions()
+    { 
+        $str = $this->actions['module'].'/'.$this->actions['controller'].'/'.$this->actions['action'];
+        if(has_access($str)){
+            return true;
+        }else{
+            do_action('access_deny');
+            json_error(['msg'=>'您没有权限访问']);
+        }
+    }
+    /**
      * 初始化
      */
     public function init()
