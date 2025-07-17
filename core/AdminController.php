@@ -41,6 +41,13 @@ class AdminController extends AppController
         $this->setSdebar();
     }
     /**
+     * 请求方法前
+     */
+    public function before()
+    {
+        return $this->checkPermissions();
+    }
+    /**
      * 设置侧边栏
      */
     protected function setSdebar()

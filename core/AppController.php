@@ -45,13 +45,6 @@ class AppController
         $this->init();
     }
     /**
-     * 请求方法前
-     */
-    public function before()
-    {
-        return $this->checkPermissions();
-    }
-    /**
      * 取当前用户权限 
      */
     public function checkPermissions()
