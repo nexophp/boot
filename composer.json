@@ -40,7 +40,8 @@
             "Upload": "./composer/codeguy/upload/src/"
         },
         "psr-4": {
-            "lib\\": "./lib/"
+            "lib\\": "./lib/",
+            "core\\": "./core/"
         }
     }
 }

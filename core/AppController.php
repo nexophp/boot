@@ -1,0 +1,112 @@
+<?php
+namespace core;
+/**
+ * 基础控制器
+ * @author sunkangchina <68103403@qq.com>
+ * @date 2025
+ */
+class AppController
+{
+    /**
+     * 渲染到视图的data数据
+     */
+    protected  $view_data = [];
+    /**
+     * 请求 module controller action
+     */
+    protected  $actions = [];
+    /**
+     * POST数据
+     */
+    protected $post_data = [];
+    /**
+     * INPUT 数据
+     */
+    protected $input_data = [];
+    /**
+     * 用户信息
+     */
+    protected $user_info = [];
+    /**
+     * 构造函数 
+     */
+    public function __construct()
+    {
+        $this->post_data = get_post() ?: [];
+        $this->input_data = get_input() ?: [];
+        $this->actions = Route::getActions();
+        $this->init();
+    }
+    /**
+     * 初始化
+     */
+    public function init()
+    {
+        $this->_loadAssets();
+        $this->_loadLang();
+        $this->user_info = $this->getUserInfo();
+        /**
+         * 基类控制器HOOK
+         */
+        do_action('AppController.init');
+    }
+    /**
+     * 获取用户信息
+     */
+    protected function getUserInfo()
+    {
+        $uid = cookie('uid');
+        if (!$uid) {
+            return [];
+        }
+        $user = db_get_one('user', '*', ['id' => $uid]);
+        if (!$user) {
+            return [];
+        }
+        $user['password'] = '';
+        return $user;
+    }
+    /**
+     * 加载语言包
+     */
+    protected function _loadLang()
+    {
+        $res = Route::getActions();
+        $lang = $res['lang'] ?? get_browser_lang();
+        if ($lang) {
+            set_lang($lang);
+        }
+    }
+    /**
+     * 路由请求后
+     */
+    public function after(&$data)
+    {
+        $action = $this->actions['action'];
+        if (!$data) {
+            $data = view($action, $this->view_data); 
+        }
+    } 
+    /**
+     * 加载资源文件
+     */
+    protected function _loadAssets()
+    {
+        global $vue;
+        $vue = new \Vue;
+        add_js("/misc/js/jquery.js");
+        add_js("/misc/js/vue.js");
+        add_js("/misc/js/jquery.cookie.js");
+        add_js("/misc/element-ui/index.js");
+        add_js("/misc/bs5/js/bootstrap.bundle.min.js");
+        add_js("/misc/layui/layui.js");
+        add_js("/misc/js/app.js");
+
+
+        add_css("/misc/bs5/css/bootstrap.min.css");
+        add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
+        add_css("/misc/element-ui/default/index.css");
+        add_css("/misc/layui/css/layui.css");
+        add_css("/misc/css/app.css");
+    }
+}
