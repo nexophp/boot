@@ -2475,6 +2475,9 @@ function create_new_url($url){
  */
 function publish_assets($module_dir)
 {
+    if(!is_local()){
+        return;
+    }
     /**
      * 复制assets下文件到PATH.'/public/assets/模块名/
      */
