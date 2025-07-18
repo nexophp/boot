@@ -2470,3 +2470,45 @@ function create_new_url($url){
     } 
     return $url;
 }
+/**
+ * 定义 assets 发布模块下的资源
+ */
+function publish_assets($module_dir)
+{
+    /**
+     * 复制assets下文件到PATH.'/public/assets/模块名/
+     */
+    $module = basename(__DIR__);
+    $assets = PATH . '/public/assets/' . $module . '/';
+    $src = $module_dir . '/assets/';
+    /**
+     * 判断assets目录是否存在
+     */
+    if (!is_dir($assets)) {
+        mkdir($assets);
+        copy_dir($src, $assets);
+    }
+}
+/**
+ * 复制目录
+ */
+function copy_dir($src, $dst)
+{
+    if (is_dir($src)) {
+        if (!is_dir($dst)) {
+            mkdir($dst);
+        }
+        $files = scandir($src);
+        foreach ($files as $file) {
+            if ($file != '.' && $file != '..') {
+                $src_file = $src . '/' . $file;
+                $dst_file = $dst . '/' . $file;
+                if (is_dir($src_file)) {
+                    copy_dir($src_file, $dst_file);
+                } else {
+                    copy($src_file, $dst_file);
+                }
+            }
+        }
+    }
+}
