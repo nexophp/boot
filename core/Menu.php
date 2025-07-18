@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 菜单数据库操作类
+ * 超简化的菜单类，使用数组存储，仅支持两级菜单
  * @author sunkangchina <68103403@qq.com>
  * @license MIT <https://mit-license.org/>
  * @date 2025
@@ -9,171 +9,107 @@
 
 namespace core;
 
-class Menu extends AppModel
+class Menu
 {
     /**
-     * 表名
+     * 静态数组存储菜单
      */
-    protected $table = 'menu';
+    private static $menu = [];
+
+    /**
+     * 默认分组
+     */
+    private static $group = 'admin';
 
     /**
      * 添加菜单
      * @param string $name 菜单唯一标识
      * @param string $title 菜单名称
-     * @param string $url 路由地址
-     * @param int $pid 父级ID，默认为0表示顶级菜单
-     * @param string $icon 菜单图标，例如 'bi bi-house'
-     * @param int $sort 排序值，值越大越靠前
-     * @return int|bool 成功返回插入ID，失败返回false
+     * @param string $url 菜单链接
+     * @param string $icon 菜单图标
+     * @param int $sort 菜单排序，值越大越靠前
+     * @param string $parent_name 父菜单唯一标识（为空表示顶级菜单）
+     * @return int|bool 成功返回菜单ID，失败返回false
      */
-    public function add($name, $title, $url = '', $pid = 0, $icon = '', $sort = 0)
+    public static function add($name, $title, $url = '', $icon = '', $sort = 0, $parent_name = '')
     {
-        if(is_ajax()){
-            return;
-        }
-        // 检查name是否已存在
-        if ($this->getByName($name)) {
+        // 防止重复添加
+        if (isset(self::$menu[self::$group][$name])) {
             return false;
         }
 
-        $data = [
+        // 初始化分组
+        if (!isset(self::$menu[self::$group])) {
+            self::$menu[self::$group] = [];
+        }
+
+        // 生成新菜单ID
+        $id = count(self::$menu[self::$group]) + 1;
+
+        // 处理子菜单
+        if ($parent_name) {
+            // 检查父菜单是否存在且是顶级菜单
+            if (!isset(self::$menu[self::$group][$parent_name]) || self::$menu[self::$group][$parent_name]['pid'] !== 0) {
+                return false;
+            }
+            self::$menu[self::$group][$name] = [
+                'id' => $id,
+                'name' => $name,
+                'title' => $title,
+                'url' => $url,
+                'icon' => $icon,
+                'sort' => $sort,
+                'pid' => self::$menu[self::$group][$parent_name]['id']
+            ];
+            return $id;
+        }
+
+        // 添加顶级菜单
+        self::$menu[self::$group][$name] = [
+            'id' => $id,
             'name' => $name,
             'title' => $title,
             'url' => $url,
-            'pid' => intval($pid),
-            'level' => $pid > 0 ? $this->getLevel($pid) + 1 : 1,
             'icon' => $icon,
-            'sort' => intval($sort)
+            'sort' => $sort,
+            'pid' => 0
         ];
 
-        return db_insert($this->table, $data);
+        return $id;
     }
 
     /**
-     * 更新菜单
-     * @param int $id 菜单ID
-     * @param array $data 更新数据
-     * @return bool 更新结果
+     * 获取两级菜单树结构
+     * @param int $pid 父级ID（默认0表示从顶级开始）
+     * @return array 菜单树
      */
-    public function update($id, $data)
+    public static function get($pid = 0)
     {
-        // 如果更新了pid，需要重新计算level
-        if (isset($data['pid'])) {
-            $data['level'] = $data['pid'] > 0 ? $this->getLevel($data['pid']) + 1 : 1;
+        // 如果分组不存在，返回空数组
+        if (!isset(self::$menu[self::$group])) {
+            return [];
         }
 
-        // 如果包含name字段，检查唯一性
-        if (isset($data['name'])) {
-            $exists = db_get_one($this->table, '*', ['name' => $data['name'], 'id[!]' => $id]);
-            if ($exists) {
-                return false;
+        // 按sort降序和id升序排序
+        $sortedMenus = self::$menu[self::$group];
+        uasort($sortedMenus, function ($a, $b) {
+            if ($a['sort'] == $b['sort']) {
+                return $a['id'] <=> $b['id'];
             }
-        }
+            return $b['sort'] <=> $a['sort'];
+        });
 
-        return db_update($this->table, $data, ['id' => $id]);
-    }
-
-    /**
-     * 删除菜单
-     * @param int $id 菜单ID
-     * @return bool 删除结果
-     */
-    public function delete($id)
-    {
-        // 先删除所有子菜单
-        $children = $this->getChildren($id);
-        foreach ($children as $child) {
-            db_del($this->table, ['id' => $child['id']]);
-        }
-
-        // 删除当前菜单
-        return db_del($this->table, ['id' => $id]);
-    }
-
-    /**
-     * 根据ID获取菜单
-     * @param int $id 菜单ID
-     * @return array|null 菜单信息
-     */
-    public function getById($id)
-    {
-        return db_get_one($this->table, '*', ['id' => $id]);
-    }
-
-    /**
-     * 根据name获取菜单
-     * @param string $name 菜单唯一标识
-     * @return array|null 菜单信息
-     */
-    public function getByName($name)
-    {
-        return db_get_one($this->table, '*', ['name' => $name]);
-    }
-
-    /**
-     * 获取菜单级别
-     * @param int $id 菜单ID
-     * @return int 菜单级别
-     */
-    public function getLevel($id)
-    {
-        $menu = $this->getById($id);
-        return $menu ? intval($menu['level']) : 0;
-    }
-
-    /**
-     * 获取所有菜单
-     * @param array $where 查询条件
-     * @return array 菜单列表
-     */
-    public function getAll($where = [])
-    {
-        // 默认按sort降序、id升序排列
-        if (!isset($where['ORDER'])) {
-            $where['ORDER'] = ['sort' => 'DESC', 'id' => 'ASC'];
-        }
-        return db_get($this->table, '*', $where);
-    }
-
-    /**
-     * 获取子菜单
-     * @param int $pid 父级ID
-     * @return array 子菜单列表
-     */
-    public function getChildren($pid)
-    {
-        return db_get($this->table, '*', ['pid' => $pid, 'ORDER' => ['sort' => 'DESC', 'id' => 'ASC']]);
-    }
-
-    /**
-     * 获取树形菜单结构
-     * @param int $pid 父级ID，默认0表示从顶级开始
-     * @return array 树形菜单
-     */
-    public function getTree($pid = 0)
-    {
-        // 获取所有菜单，按sort降序排列
-        $allMenus = $this->getAll(['ORDER' => ['sort' => 'DESC', 'level' => 'ASC', 'id' => 'ASC']]);
-
-        // 构建树形结构
-        return $this->buildTree($allMenus, $pid);
-    }
-
-    /**
-     * 构建树形结构
-     * @param array $menus 所有菜单
-     * @param int $pid 父级ID
-     * @return array 树形结构
-     */
-    private function buildTree($menus, $pid = 0)
-    {
+        // 构建两级菜单树
         $tree = [];
-
-        foreach ($menus as $menu) {
+        foreach ($sortedMenus as $menu) {
             if ($menu['pid'] == $pid) {
-                $children = $this->buildTree($menus, $menu['id']);
-                if ($children) {
-                    $menu['children'] = $children;
+                if ($pid == 0) {
+                    // 为顶级菜单添加子菜单
+                    $children = array_filter($sortedMenus, fn($m) => $m['pid'] == $menu['id']);
+                    if ($children) {
+                        uasort($children, fn($a, $b) => $b['sort'] <=> $a['sort'] ?: $a['id'] <=> $b['id']);
+                        $menu['children'] = array_values($children);
+                    }
                 }
                 $tree[] = $menu;
             }
@@ -183,115 +119,11 @@ class Menu extends AppModel
     }
 
     /**
-     * 获取菜单路径（从顶级到当前菜单的路径）
-     * @param int $id 菜单ID
-     * @return array 菜单路径
+     * 设置当前分组
+     * @param string $group 分组名称
      */
-    public function getPath($id)
+    public static function setGroup($group)
     {
-        $path = [];
-        $menu = $this->getById($id);
-
-        if (!$menu) {
-            return $path;
-        }
-
-        $path[] = $menu;
-
-        // 递归获取父级菜单
-        if ($menu['pid'] > 0) {
-            $parentPath = $this->getPath($menu['pid']);
-            $path = array_merge($parentPath, $path);
-        }
-
-        return $path;
-    }
-
-    /**
-     * 移动菜单（修改父级）
-     * @param int $id 菜单ID
-     * @param int $pid 新的父级ID
-     * @return bool 移动结果
-     */
-    public function move($id, $pid)
-    {
-        // 不能将菜单移动到自己或其子菜单下
-        if ($id == $pid) {
-            return false;
-        }
-
-        // 检查是否是将菜单移动到其子菜单下
-        $children = $this->getChildren($id);
-        foreach ($children as $child) {
-            if ($child['id'] == $pid) {
-                return false;
-            }
-        }
-
-        // 计算新的level
-        $level = $pid > 0 ? $this->getLevel($pid) + 1 : 1;
-
-        // 更新当前菜单
-        $result = $this->update($id, ['pid' => $pid, 'level' => $level]);
-
-        // 更新所有子菜单的level
-        if ($result) {
-            $this->updateChildrenLevel($id, $level);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 更新子菜单的level
-     * @param int $pid 父级ID
-     * @param int $parentLevel 父级level
-     */
-    private function updateChildrenLevel($pid, $parentLevel)
-    {
-        $children = $this->getChildren($pid);
-
-        foreach ($children as $child) {
-            $newLevel = $parentLevel + 1;
-            db_update($this->table, ['level' => $newLevel], ['id' => $child['id']]);
-
-            // 递归更新子菜单
-            $this->updateChildrenLevel($child['id'], $newLevel);
-        }
-    }
-
-    /**
-     * 更新菜单排序
-     * @param int $id 菜单ID
-     * @param int $sort 排序值，值越大排列越靠前
-     * @return bool 更新结果
-     */
-    public function updateSort($id, $sort)
-    {
-        return $this->update($id, ['sort' => intval($sort)]);
-    }
-
-    /**
-     * 批量更新菜单排序
-     * @param array $sortData 排序数据，格式：[['id' => 1, 'sort' => 100], ['id' => 2, 'sort' => 90]...]
-     * @return bool 更新结果
-     */
-    public function batchUpdateSort($sortData)
-    {
-        if (empty($sortData) || !is_array($sortData)) {
-            return false;
-        }
-
-        $result = true;
-        foreach ($sortData as $item) {
-            if (isset($item['id']) && isset($item['sort'])) {
-                $updateResult = $this->updateSort($item['id'], $item['sort']);
-                if (!$updateResult) {
-                    $result = false;
-                }
-            }
-        }
-
-        return $result;
+        self::$group = $group;
     }
 }
