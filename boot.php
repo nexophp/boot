@@ -43,8 +43,7 @@ require NEXOPHP_PATH . '/db/boot.php';
 global $autoload;
 $autoload = require PATH . '/vendor/autoload.php';
 $autoload->addPsr4('app\\', PATH . '/app/');
-$autoload->addPsr4('modules\\', PATH . '/modules/');
-require __DIR__ . '/inc/addon.php';
+$autoload->addPsr4('modules\\', PATH . '/modules/'); 
 require __DIR__ . '/inc/function.php';
 require __DIR__ . '/inc/jwt.php';
 require __DIR__ . '/inc/request.php';
@@ -75,6 +74,10 @@ add_action("footer", function () {
  * 应用初始化
  */
 do_action("app.init");
+/**
+ * addon
+ */
+require __DIR__ . '/inc/addon.php';
 /**
  * 加载项目自己的include文件
  */
