@@ -120,8 +120,13 @@ class AppController
         add_js("/misc/element-ui/index.js");
         add_js("/misc/bs5/js/bootstrap.bundle.min.js");
         add_js("/misc/layui/layui.js");
-        add_js("/misc/js/app.js");
-
+        add_js("/misc/sortable/sortable.js");
+        add_js("/misc/sortable/vuedraggable.umd.js");
+        add_js("/misc/js/vue-tags-input.js");
+        add_js("/misc/js/reconnecting-websocket.js");
+        add_js("/misc/js/file-saver.js");
+        add_js("/misc/js/xlsx.js");
+        add_js("/misc/js/app.js"); 
 
         add_css("/misc/bs5/css/bootstrap.min.css");
         add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
