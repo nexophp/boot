@@ -104,6 +104,15 @@ function get_module_name($file)
     return substr($path, strrpos($path, '/') + 1);
 }
 /**
+ * 获取模块路径
+ */
+function get_module_path($file)
+{
+    $path = substr($file, strlen(PATH));
+    $path = get_dir($path);
+    return $path;
+}
+/**
  * 视图
  */
 function view($file, $params = [])

@@ -28,6 +28,9 @@ class Menu extends AppModel
      */
     public function add($name, $title, $url = '', $pid = 0, $icon = '', $sort = 0)
     {
+        if(is_ajax()){
+            return;
+        }
         // 检查name是否已存在
         if ($this->getByName($name)) {
             return false;
