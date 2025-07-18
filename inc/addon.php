@@ -62,17 +62,11 @@ function include_installed_modules()
     $module_info = get_all_modules();
     if ($module_info) {
         foreach ($module_info as $file) {
-            //判断文件中是否有 $modules_info 变量 
-            $content = file_get_contents($file);
-            if (strpos($content, "\$module_info") === false) {
-                require $file;
-            } else {
-                //判断模块是否已安装
-                $path = substr($file, strlen(PATH));
-                $path = get_dir($path);
-                $name = basename(dirname($path));
+            $name = get_module_name($file);
+            if ($name) {
                 $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
                 if ($module) {
+                    echo $file . "<br>";
                     require $file;
                 }
             }
@@ -90,6 +84,24 @@ function get_all_modules()
     $app_list = glob(PATH . '/app/*/nexophp.php');
     $list = array_merge($vendor_list, $modules_list, $app_list);
     return $list;
+}
+/**
+ * 获取模块名称
+ * 先调用 get_all_modules 
+ */
+function get_module_name($file)
+{
+    $content = file_get_contents($file);
+    if (strpos($content, "\$module_info") === false) {
+        return;
+    }
+    require $file;
+    $path = substr($file, strlen(PATH));
+    $path = get_dir($path);
+    if (substr($path, -4) == '/src') {
+        $path = substr($path, 0, -4);
+    }
+    return substr($path, strrpos($path, '/') + 1);
 }
 /**
  * 视图
