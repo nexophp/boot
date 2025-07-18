@@ -90,10 +90,10 @@ function get_all_modules()
  * 获取模块名称
  * 先调用 get_all_modules 
  */
-function get_module_name($file)
+function get_module_name($file, $ignore_noe_module = true)
 {
     $content = file_get_contents($file);
-    if (strpos($content, "\$module_info") === false) {
+    if ($ignore_noe_module && strpos($content, "\$module_info") === false) {
         return;
     }
     $path = substr($file, strlen(PATH));
@@ -126,6 +126,17 @@ function view($file, $params = [])
     $files[] = PATH . '/app/' . $module . '/view/' . $file . '.php';
     $files[] = PATH . '/modules/' . $module . '/view/' . $controller . '/' . $file . '.php';
     $files[] = PATH . '/modules/' . $module . '/view/' . $file . '.php';
+    $all = get_all_modules();
+    $name = [];
+    $current_module_path = '';
+    foreach ($all as $v) {
+        $module_name = get_module_name($v, false);
+        if ($module_name == $module) {
+            $current_module_path = get_module_path($v);
+        }
+    }
+    $files[] = PATH . $current_module_path . '/view/' . $controller . '/' . $file . '.php';
+    $files[] = PATH . $current_module_path . '/view/' . $file . '.php';
     try {
         $composer_module_path = db_get_one("module", "path", ['name' => $module]);
         if ($composer_module_path) {
