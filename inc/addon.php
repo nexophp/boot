@@ -66,7 +66,6 @@ function include_installed_modules()
             if ($name) {
                 $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
                 if ($module) {
-                    echo $file . "<br>";
                     require $file;
                 }
             }
@@ -94,8 +93,7 @@ function get_module_name($file)
     $content = file_get_contents($file);
     if (strpos($content, "\$module_info") === false) {
         return;
-    }
-    require $file;
+    } 
     $path = substr($file, strlen(PATH));
     $path = get_dir($path);
     if (substr($path, -4) == '/src') {
