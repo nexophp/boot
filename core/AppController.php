@@ -35,6 +35,10 @@ class AppController
      */
     protected $user_info = [];
     /**
+     * 用户id
+     */
+    protected $user_id = '';
+    /**
      * 构造函数 
      */
     public function __construct()
@@ -84,6 +88,7 @@ class AppController
             return [];
         }
         $user['password'] = '';
+        $this->user_id = $user['id'];
         return $user;
     }
     /**
