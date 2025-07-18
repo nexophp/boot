@@ -92,9 +92,8 @@ class AppController
     protected function _loadLang()
     {
         $default_lang = get_config('default_lang');
-        if ($default_lang != 'auto') {
-            $lang = $default_lang;
-            set_lang($lang);
+        if ($default_lang != 'auto') { 
+            set_lang($default_lang);
             return;
         }
         $res = Route::getActions();
