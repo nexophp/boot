@@ -76,11 +76,6 @@ add_action("footer", function () {
  */
 do_action("app.init");
 /**
- * 加载依赖数据库的功能
- * 如模块
- */
-require __DIR__ . '/inc/db.php';
-/**
  * 加载项目自己的include文件
  */
 $include_file = PATH.'/include.php';
