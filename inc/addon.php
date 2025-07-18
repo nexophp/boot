@@ -68,6 +68,8 @@ function include_installed_modules()
                 if ($module) {
                     require $file;
                 }
+            } else {
+                include $file;
             }
         }
     }
@@ -93,7 +95,7 @@ function get_module_name($file)
     $content = file_get_contents($file);
     if (strpos($content, "\$module_info") === false) {
         return;
-    } 
+    }
     $path = substr($file, strlen(PATH));
     $path = get_dir($path);
     if (substr($path, -4) == '/src') {
