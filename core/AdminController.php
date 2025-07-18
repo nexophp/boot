@@ -23,8 +23,8 @@ class AdminController extends AppController
          * 加载admin.css
          */
         if ($this->with_admin_css) {
-            add_css("/misc/css/admin.css");
-            add_js("/misc/js/admin.js");
+            add_css("/assets/admin/admin.css");
+            add_js("/assets/admin/admin.js");
         }
         /**
          * 没有用户信息跳转到登录页面
