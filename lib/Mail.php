@@ -92,15 +92,14 @@ class Mail
 	 * 初始化
 	 */
 	public static function init($dsn = '')
-	{
-		global $config;
+	{ 
 		$mail_from = get_config('mail_from');
 		$pwd = get_config('mail_pwd');
-		$mail_smtp = get_config('mail_smtp');
+		$mail_smtp = get_config('mail_smtp')?:"smtp.qq.com";
 		$mail_port = get_config('mail_port') ?: 465;
-		$dsn = get_config('mail_dsn') ?: "smtp://" . $mail_from . ":" . $pwd . "@" . $mail_smtp . ":" . $mail_port;
+		$dsn = get_config('mail_dsn') ?: "smtp://" . $mail_from . ":" . $pwd . "@" . $mail_smtp . ":" . $mail_port . "?verify_peer=0";
 		self::$mail_from = $mail_from;
-		ini_set("default_socket_timeout", 3);
+		ini_set("default_socket_timeout", 5);
 		$transport = Transport::fromDsn($dsn);
 		self::$mailer = new Mailer($transport);
 		self::$email  = new Email();
