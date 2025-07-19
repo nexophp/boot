@@ -1841,7 +1841,6 @@ function get_upload_url($f)
 function add_js($code)
 {
     global $_app;
-    $code = trim($code);
     //判断换行数量 
     if (substr_count($code, "\n") > 1) {
         $_app['js_code'][] = $code;
@@ -1861,6 +1860,10 @@ function render_js()
         $all = array_merge($all, $js);
     }
     if ($all) {
+        $ret = do_action("js_code", $all);
+        if ($ret) {
+            return $ret;
+        }
         echo '<script type="text/javascript">
         $(function(){';
         foreach ($all as $v) {
@@ -1878,12 +1881,16 @@ function render_js_file()
     global $_app;
     $all = $_app['js'] ?: [];
     if ($all) {
+        $ret = do_action("js_files", $all);
+        if ($ret) {
+            return $ret;
+        }
         foreach ($all as $v) {
             if (is_string($v)) {
                 if (strpos($v, '://') === false) {
                     $v = cdn() . $v;
                 }
-                echo '<script type="text/javascript" src="' . $v . '"></script>';
+                echo '<script type="text/javascript" src="' . $v . '"></script>' . "\n";
             }
         }
     }
@@ -1894,7 +1901,6 @@ function render_js_file()
 function add_css($code)
 {
     global $_app;
-    $code = trim($code);
     //判断换行数量 
     if (substr_count($code, "\n") > 1) {
         $_app['css_code'][] = $code;
@@ -1908,12 +1914,16 @@ function add_css($code)
 function render_css()
 {
     global $_app;
-    $js = get_block('css');
+    $css = get_block('css');
     $all = $_app['css_code'] ?: [];
-    if ($js) {
-        $all = array_merge($all, $js);
+    if ($css) {
+        $all = array_merge($all, $css);
     }
     if ($all) {
+        $ret = do_action("css_code", $all);
+        if ($ret) {
+            return $ret;
+        }
         echo '<style type="text/css">';
         foreach ($all as $v) {
             echo $v . "\n";
@@ -1929,12 +1939,16 @@ function render_css_file()
     global $_app;
     $all = $_app['css'] ?: [];
     if ($all) {
+        $ret = do_action("css_files", $all);
+        if ($ret) {
+            return $ret;
+        }
         foreach ($all as $v) {
             if (is_string($v)) {
                 if (strpos($v, '://') === false) {
                     $v = cdn() . $v;
                 }
-                echo '<link href="' . $v . '" rel="stylesheet">';
+                echo '<link href="' . $v . '" rel="stylesheet">' . "\n";
             }
         }
     }
@@ -2166,13 +2180,13 @@ function  copy_base64_data()
 {
     global $vue;
     $str = " 
-	    location.origin.includes(`https://`) || Message.error(`图片复制功能不可用`);
-	    data = data.split(';base64,'); let type = data[0].split('data:')[1]; data = data[1]; 
-	    let bytes = atob(data), ab = new ArrayBuffer(bytes.length), ua = new Uint8Array(ab);
-	    [...Array(bytes.length)].forEach((v, i) => ua[i] = bytes.charCodeAt(i));
-	    let blob = new Blob([ab], { type }); 
-	    navigator.clipboard.write([new ClipboardItem({ [type]: blob })]); 
-	";
+        location.origin.includes(`https://`) || Message.error(`图片复制功能不可用`);
+        data = data.split(';base64,'); let type = data[0].split('data:')[1]; data = data[1]; 
+        let bytes = atob(data), ab = new ArrayBuffer(bytes.length), ua = new Uint8Array(ab);
+        [...Array(bytes.length)].forEach((v, i) => ua[i] = bytes.charCodeAt(i));
+        let blob = new Blob([ab], { type }); 
+        navigator.clipboard.write([new ClipboardItem({ [type]: blob })]); 
+    ";
     if ($vue) {
         $vue->method("copy_base64_data(data)", $str);
         return;
@@ -2291,7 +2305,7 @@ function _xml2array_node($node)
 /**
  * 从文件中安装SQL
  * install_sql(local_sql_file,function($sql){
- * 	$db->query($sql);
+ *  $db->query($sql);
  * })
  */
 function install_sql($file, $call)
@@ -2453,21 +2467,23 @@ function app($class_name, $params = [])
 /**
  * 生成URL
  */
-function url($url,$par = []){
+function url($url, $par = [])
+{
     $url = create_new_url($url);
-    return Route:: url($url, $par);
+    return Route::url($url, $par);
 }
 
 /**
  * 生成URL 
  */
-function create_new_url($url){
+function create_new_url($url)
+{
     $slashCount = substr_count($url, '/');
-    if($slashCount == 2){
-        $url = $url.'/index';
-    }else if($slashCount == 1){
-        $url = $url.'/site/index';
-    } 
+    if ($slashCount == 2) {
+        $url = $url . '/index';
+    } else if ($slashCount == 1) {
+        $url = $url . '/site/index';
+    }
     return $url;
 }
 /**
@@ -2475,7 +2491,7 @@ function create_new_url($url){
  */
 function publish_assets($module_dir)
 {
-    if(!is_local()){
+    if (!is_local()) {
         return;
     }
     /**
