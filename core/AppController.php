@@ -140,12 +140,14 @@ class AppController
         add_js("/misc/js/reconnecting-websocket.js");
         add_js("/misc/js/file-saver.js");
         add_js("/misc/js/xlsx.js");
+        add_js("https://unpkg.com/@wangeditor/editor@latest/dist/index.js");
         add_js("/misc/js/app.js"); 
 
         add_css("/misc/bs5/css/bootstrap.min.css");
         add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
         add_css("/misc/element-ui/default/index.css");
         add_css("/misc/layui/css/layui.css");
+        add_css("https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css");
         add_css("/misc/css/app.css");
     }
 }
