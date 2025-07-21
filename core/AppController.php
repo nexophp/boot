@@ -91,7 +91,7 @@ class AppController
             return [];
         }
         $user['password'] = '';
-        $this->user_id = $user['id'];
+        $this->uid = $this->user_id = $user['id']; 
         return $user;
     }
     /**
