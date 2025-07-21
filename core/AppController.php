@@ -38,6 +38,7 @@ class AppController
      * 用户id
      */
     protected $user_id = '';
+    protected $uid     = '';
     /**
      * 构造函数 
      */
@@ -79,11 +80,12 @@ class AppController
      */
     protected function getUserInfo()
     {
-        global $uid;
+        global $uid,$user_id;
         $uid = cookie('uid');
         if (!$uid) {
             return [];
         }
+        $user_id = $uid;
         $user = db_get_one('user', '*', ['id' => $uid]);
         if (!$user) {
             return [];
