@@ -79,6 +79,7 @@ class AppController
      */
     protected function getUserInfo()
     {
+        global $uid;
         $uid = cookie('uid');
         if (!$uid) {
             return [];
