@@ -133,6 +133,7 @@ class AppController
         $vue = new \Vue;
         add_js("/misc/js/jquery.js");
         add_js("/misc/js/vue.js");
+        add_js('/misc/select2/js/select2.min.js');
         add_js("/misc/js/jquery.cookie.js");
         add_js("/misc/element-ui/index.js");
         add_js("/misc/bs5/js/bootstrap.bundle.min.js");
@@ -145,7 +146,9 @@ class AppController
         add_js("/misc/js/xlsx.js");
         add_js("https://unpkg.com/@wangeditor/editor@latest/dist/index.js");
         add_js("/misc/js/app.js"); 
+        
 
+        add_css('/misc/select2/css/select2.min.css'); 
         add_css("/misc/bs5/css/bootstrap.min.css");
         add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
         add_css("/misc/element-ui/default/index.css");
