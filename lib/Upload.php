@@ -98,7 +98,7 @@ class Upload
             }
         }
         if (!self::$allow_upload) {
-            json_error(['msg' => '上传文件被拦截，不支持当前用户上传文件']);
+            json_error(['msg' => lang('上传文件被拦截，不支持当前用户上传文件')]);
         }
         global $config;
         //上传文件前
