@@ -12,18 +12,20 @@ use Firebase\JWT\JWT as Firebase_JWT;
 /**
  * 是否是管理员
  */
-function is_admin($uid = ''){
+function is_admin($uid = '')
+{
 	$user = get_user($uid);
-	if($user && $user['tag'] == 'admin'){
+	if ($user && $user['tag'] == 'admin') {
 		return true;
 	}
 }
 /**
  * 获取用户信息
  */
-function get_user($uid = ''){
-	$uid = $uid?:cookie('uid');
-	return db_get_one('user',"*",['id'=>$uid]);
+function get_user($uid = '')
+{
+	$uid = $uid ?: cookie('uid');
+	return db_get_one('user', "*", ['id' => $uid]);
 }
 /**
  * 返回接口AUTHORIZATION解密后数组
@@ -39,7 +41,7 @@ function api($show_error = true)
 			$api_data = $user;
 		}
 		if (!$api_data) {
-			$api_data = get_author(null, false, $show_error);
+			$api_data = get_author($show_error);
 		}
 	}
 	return $api_data;
@@ -56,43 +58,30 @@ function api_admin()
 }
 
 /**
- * 解析 HTTP_AUTHORIZATION
- * 
+ * 解析 HTTP_AUTHORIZATION 
  */
-function get_author($sign = null, $ignore_time_check = false, $show_error = true)
+function get_author($show_error = true)
 {
 	global $config;
+	$sign  = $_SERVER['HTTP_AUTHORIZATION'] ?: g('sign');
 	if (!$sign) {
-		$sign  = $_SERVER['HTTP_AUTHORIZATION'];
-	}
-	if (!$sign) {
-		$error = 'Sign Error';
-	}
-	$key = $config['jwt_key'];
-	if (!$key) {
-		$error = lang('auth_key_error');
-	}
-	if (g('sign')) {
-		$sign = g('sign');
+		$error = '参数错误';
 	}
 	$jwt  = Jwt::decode($sign);
 	if (!$jwt->time) {
-		$error = lang('auth_key_error');
+		$error = '缺少time参数';
 	}
-	$exp = $config['jwt_exp_time'];
-	if ($exp <= 0) {
-		$exp = 3600;
-	}
-	if (!$ignore_time_check && $jwt->time + $exp < time()) {
-		$error = lang('auth_exp_error');
+	$exp = $config['jwt_exp_time'] ?: 120;
+	if ($jwt->time + $exp < time()) {
+		$error = 'Token过期';
 	}
 	if ($jwt->user_id) {
 	} else {
-		$error = lang('auth_user_error');
+		$error = '错误user_id参数';
 	}
 	if ($error) {
 		if ($show_error) {
-			json_error(['msg' => $error]);
+			json_error(['msg' => lang($error)]);
 		}
 	}
 	return (array)$jwt;
