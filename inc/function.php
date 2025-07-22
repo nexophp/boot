@@ -2531,3 +2531,46 @@ function copy_dir($src, $dst)
         }
     }
 }
+/**
+ * 运行命令,不等待命令执行完成
+ * @param string $cmd 命令
+ */
+function run_cmd($cmd)
+{
+    $tmp = PATH . '/runtime/cmd';
+    if (!is_dir($tmp)) {
+        mkdir($tmp, 0777, true);
+    }
+    $cmd = 'nohup ' . $cmd . ' > ' . $tmp . '/cmd.log 2>&1 & echo $!';
+    exec($cmd, $output, $return_var);
+    return $return_var === 0 ? trim(implode("\n", $output)) : false; // 返回PID
+}
+/**
+ * 图片类处理INIT
+ * @return \Intervention\Image\ImageManager
+ */
+function image_drive()
+{
+    static $image_drive;
+    if (!$image_drive) {
+        $imageDrive = get_config('image_drive') ?: 'Gd';
+        $drive = "\Intervention\Image\Drivers\\" . $imageDrive . "\Driver";
+        $driveClass = new $drive();
+        $image_drive = new \Intervention\Image\ImageManager($driveClass);
+    }
+    return $image_drive;
+}
+/**
+ * 把URL中的域名部分移除
+ */
+function remove_http($url)
+{
+    if (strpos($url, '://') !== false) {
+        $url = str_replace('http://', '', $url);
+        $url = str_replace('https://', '', $url);
+        if (strpos($url, '/') !== false) {
+            $url = substr($url, strpos($url, '/'));
+        }
+    }
+    return $url;
+}
