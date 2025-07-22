@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 数据脱敏处理类
+ * 数据脱敏
  * @author sunkangchina <68103403@qq.com>
  * @license MIT <https://mit-license.org/>
  * @date 2025
@@ -10,7 +10,6 @@
 namespace core;
 
 use InvalidArgumentException;
-
 
 class DataMasker
 {
@@ -126,30 +125,55 @@ class DataMasker
 
         $data = trim($data);
 
-        // 手机号检测 (11位数字，以1[3-9]开头)
-        if (preg_match('/^1[3-9]\d{9}$/', $data)) {
-            return self::phone($data);
+        // 处理包含多种敏感信息的字符串
+        $patterns = [
+            // 手机号 (11位数字，以1[3-9]开头，考虑空格、连字符等)
+            '/\b1[3-9]\d{9}\b/' => function ($matches) {
+                return self::phone($matches[0]);
+            },
+            // 邮箱 (标准邮箱格式)
+            '/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/' => function ($matches) {
+                return self::email($matches[0]);
+            },
+            // 身份证 (15或18位，最后可能为X)
+            '/\b[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]?\b/' => function ($matches) {
+                return self::idCard($matches[0]);
+            },
+            // 验证码 (4-6位数字或字母)
+            '/\b[A-Za-z0-9]{4,6}\b/' => function ($matches) {
+                return self::verificationCode($matches[0]);
+            },
+        ];
+
+        $result = $data;
+        foreach ($patterns as $pattern => $callback) {
+            $result = preg_replace_callback($pattern, $callback, $result);
         }
 
-        // 邮箱检测
-        if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
-            return self::email($data);
+        // 如果字符串只包含单一敏感数据，尝试直接处理
+        if ($result === $data) {
+            // 手机号检测
+            if (preg_match('/^1[3-9]\d{9}$/', $data)) {
+                return self::phone($data);
+            }
+            // 邮箱检测
+            if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
+                return self::email($data);
+            }
+            // 身份证检测
+            if (
+                preg_match('/^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/', $data) ||
+                preg_match('/^[1-9]\d{7}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}$/', $data)
+            ) {
+                return self::idCard($data);
+            }
+            // 验证码检测
+            if (preg_match('/^[A-Za-z0-9]{4,6}$/', $data)) {
+                return self::verificationCode($data);
+            }
         }
 
-        // 身份证检测 (15或18位，最后可能为X)
-        if (
-            preg_match('/^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/', $data) ||
-            preg_match('/^[1-9]\d{7}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}$/', $data)
-        ) {
-            return self::idCard($data);
-        }
-
-        // 验证码检测 (4-6位数字或字母)
-        if (preg_match('/^[A-Za-z0-9]{4,6}$/', $data)) {
-            return self::verificationCode($data);
-        }
-
-        // 默认返回原始数据
-        return $data;
+        // 返回处理后的结果
+        return $result;
     }
 }
