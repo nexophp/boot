@@ -2581,11 +2581,18 @@ function cache_data($key, $data = null, $expire = 0)
 {
     $res = db_get_one('cache_data', 'id', ['key' => $key]);
     if ($data === null) {
-        return $res;
+        if ($res['expire'] > 0 && $res['expire'] < time()) {
+            return $res['data'];
+        } else {
+            return;
+        }
     }
     if ($res) {
         db_update('cache_data', ['id' => $res], ['data' => $data, 'expire' => $expire, 'updated_at' => time()]);
     } else {
+        if ($expire > 0) {
+            $expire = time() + $expire;
+        }
         db_insert('cache_data', [
             'key' => $key,
             'data' => $data,
