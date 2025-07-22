@@ -7,173 +7,136 @@
  * @date 2025
  */
 
-namespace core;
-
-use InvalidArgumentException;
+namespace lib;
 
 class DataMasker
 {
-    private const PHONE_MIN_LENGTH = 7;
-    private const IDCARD_MIN_LENGTH = 8;
-    private const VERIFICATION_CODE_MIN_LENGTH = 2;
-    private const MASK_CHAR = '*';
-    private const PHONE_MASK_LENGTH = 4;
-    private const EMAIL_MASK_LENGTH = 3;
-
     /**
-     * 手机号脱敏
-     *
-     * @param string|null $phone 待脱敏的手机号
-     * @return string|null 脱敏后的手机号
-     * @throws InvalidArgumentException 如果输入无效
+     * 脱敏手机号码
+     * @param string $phone 手机号码
+     * @return string 脱敏后的手机号码
      */
-    public static function phone(?string $phone): ?string
+    public static function phone($phone)
     {
         if (empty($phone)) {
-            return $phone;
+            return '';
         }
-
-        $phone = trim($phone);
-        if (strlen($phone) < self::PHONE_MIN_LENGTH) {
-            throw new InvalidArgumentException('手机号长度不足');
-        }
-
-        return substr($phone, 0, 3) . str_repeat(self::MASK_CHAR, self::PHONE_MASK_LENGTH) . substr($phone, -4);
+        // 保留前3位和后4位，中间用****代替
+        return substr($phone, 0, 3) . '****' . substr($phone, -4);
     }
 
     /**
-     * 邮箱地址脱敏
-     *
-     * @param string|null $email 待脱敏的邮箱地址
-     * @return string|null 脱敏后的邮箱地址
-     * @throws InvalidArgumentException 如果输入无效
+     * 脱敏身份证号码
+     * @param string $idCard 身份证号码
+     * @return string 脱敏后的身份证号码
      */
-    public static function email(?string $email): ?string
-    {
-        if (empty($email) || !str_contains($email, '@')) {
-            return $email;
-        }
-
-        $email = trim($email);
-        [$prefix, $domain] = explode('@', $email, 2);
-
-        $prefixLength = strlen($prefix);
-        if ($prefixLength <= 1) {
-            $maskedPrefix = $prefix[0] . str_repeat(self::MASK_CHAR, self::EMAIL_MASK_LENGTH);
-        } else {
-            $maskedPrefix = $prefix[0] . str_repeat(self::MASK_CHAR, min(self::EMAIL_MASK_LENGTH, $prefixLength - 1)) . substr($prefix, -1);
-        }
-
-        return $maskedPrefix . '@' . $domain;
-    }
-
-    /**
-     * 身份证号脱敏
-     *
-     * @param string|null $idCard 待脱敏的身份证号
-     * @return string|null 脱敏后的身份证号
-     * @throws InvalidArgumentException 如果输入无效
-     */
-    public static function idCard(?string $idCard): ?string
+    public static function idCard($idCard)
     {
         if (empty($idCard)) {
-            return $idCard;
+            return '';
         }
-
-        $idCard = trim($idCard);
-        if (strlen($idCard) < self::IDCARD_MIN_LENGTH) {
-            throw new InvalidArgumentException('身份证号长度不足');
-        }
-
-        return substr($idCard, 0, 4) . str_repeat(self::MASK_CHAR, strlen($idCard) - self::IDCARD_MIN_LENGTH) . substr($idCard, -4);
+        // 保留前6位和后4位，中间用********代替
+        return substr($idCard, 0, 6) . '********' . substr($idCard, -4);
     }
 
     /**
-     * 验证码脱敏
-     *
-     * @param string|null $code 待脱敏的验证码
-     * @return string|null 脱敏后的验证码
-     * @throws InvalidArgumentException 如果输入无效
+     * 脱敏银行卡号
+     * @param string $bankCard 银行卡号
+     * @return string 脱敏后的银行卡号
      */
-    public static function verificationCode(?string $code): ?string
+    public static function bankCard($bankCard)
     {
-        if (empty($code)) {
-            return $code;
+        if (empty($bankCard)) {
+            return '';
         }
-
-        $code = trim($code);
-        $length = strlen($code);
-        if ($length <= self::VERIFICATION_CODE_MIN_LENGTH) {
-            return str_repeat(self::MASK_CHAR, $length);
-        }
-
-        return $code[0] . str_repeat(self::MASK_CHAR, $length - 2) . $code[$length - 1];
+        // 保留前4位和后4位，中间用****代替
+        return substr($bankCard, 0, 4) . '****' . substr($bankCard, -4);
     }
 
     /**
-     * 自动识别并脱敏敏感数据
-     *
-     * @param string|null $data 待脱敏的数据
-     * @return string|null 脱敏后的数据
-     * @throws InvalidArgumentException 如果输入无效
+     * 脱敏姓名
+     * @param string $name 姓名
+     * @return string 脱敏后的姓名
      */
-    public static function auto(?string $data): ?string
+    public static function name($name)
     {
-        if (empty($data)) {
-            return $data;
+        if (empty($name)) {
+            return '';
+        }
+        // 中文姓名保留姓，名字用*代替
+        $length = mb_strlen($name, 'UTF-8');
+        if ($length <= 2) {
+            return mb_substr($name, 0, 1, 'UTF-8') . '*';
+        }
+        return mb_substr($name, 0, 1, 'UTF-8') . str_repeat('*', $length - 2) . mb_substr($name, -1, 1, 'UTF-8');
+    }
+
+    /**
+     * 脱敏邮箱
+     * @param string $email 邮箱地址
+     * @return string 脱敏后的邮箱地址
+     */
+    public static function email($email)
+    {
+        if (empty($email)) {
+            return '';
+        }
+        $parts = explode('@', $email);
+        if (count($parts) !== 2) {
+            return $email;
+        }
+        $username = $parts[0];
+        $domain = $parts[1];
+        $len = strlen($username);
+        if ($len <= 3) {
+            return substr($username, 0, 1) . '**@' . $domain;
+        }
+        return substr($username, 0, 2) . str_repeat('*', $len - 3) . substr($username, -1) . '@' . $domain;
+    }
+
+    /**
+     * 自动识别并脱敏字符串中的敏感数据
+     * @param string $input 待处理的字符串
+     * @return string 脱敏后的字符串
+     */
+    public static function auto($input)
+    {
+        if (empty($input)) {
+            return '';
         }
 
-        $data = trim($data);
+        $output = $input;
 
-        // 处理包含多种敏感信息的字符串
-        $patterns = [
-            // 手机号 (11位数字，以1[3-9]开头，考虑空格、连字符等)
-            '/\b1[3-9]\d{9}\b/' => function ($matches) {
-                return self::phone($matches[0]);
-            },
-            // 邮箱 (标准邮箱格式)
-            '/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/' => function ($matches) {
-                return self::email($matches[0]);
-            },
-            // 身份证 (15或18位，最后可能为X)
-            '/\b[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]?\b/' => function ($matches) {
-                return self::idCard($matches[0]);
-            },
-            // 验证码 (4-6位数字或字母)
-            '/\b[A-Za-z0-9]{4,6}\b/' => function ($matches) {
-                return self::verificationCode($matches[0]);
-            },
-        ];
+        // 手机号码（11位数字）
+        $phonePattern = '/\b1[3-9]\d{9}\b/';
+        $output = preg_replace_callback($phonePattern, function ($matches) {
+            return self::phone($matches[0]);
+        }, $output);
 
-        $result = $data;
-        foreach ($patterns as $pattern => $callback) {
-            $result = preg_replace_callback($pattern, $callback, $result);
-        }
+        // 身份证号码（15或18位）
+        $idCardPattern = '/\b\d{15}(?:\d{2}[0-9Xx])?\b/';
+        $output = preg_replace_callback($idCardPattern, function ($matches) {
+            return self::idCard($matches[0]);
+        }, $output);
 
-        // 如果字符串只包含单一敏感数据，尝试直接处理
-        if ($result === $data) {
-            // 手机号检测
-            if (preg_match('/^1[3-9]\d{9}$/', $data)) {
-                return self::phone($data);
-            }
-            // 邮箱检测
-            if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
-                return self::email($data);
-            }
-            // 身份证检测
-            if (
-                preg_match('/^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/', $data) ||
-                preg_match('/^[1-9]\d{7}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}$/', $data)
-            ) {
-                return self::idCard($data);
-            }
-            // 验证码检测
-            if (preg_match('/^[A-Za-z0-9]{4,6}$/', $data)) {
-                return self::verificationCode($data);
-            }
-        }
+        // 银行卡号（16-19位数字）
+        $bankCardPattern = '/\b\d{16,19}\b/';
+        $output = preg_replace_callback($bankCardPattern, function ($matches) {
+            return self::bankCard($matches[0]);
+        }, $output);
 
-        // 返回处理后的结果
-        return $result;
+        // 邮箱地址
+        $emailPattern = '/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/';
+        $output = preg_replace_callback($emailPattern, function ($matches) {
+            return self::email($matches[0]);
+        }, $output);
+
+        // 中文姓名（2-4个中文字符）
+        $namePattern = '/[\x{4e00}-\x{9fa5}]{2,4}\b/u';
+        $output = preg_replace_callback($namePattern, function ($matches) {
+            return self::name($matches[0]);
+        }, $output);
+
+        return $output;
     }
 }
