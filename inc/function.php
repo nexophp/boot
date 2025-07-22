@@ -2574,3 +2574,23 @@ function remove_http($url)
     }
     return $url;
 }
+/**
+ * 数据库缓存数据
+ */
+function cache_data($key, $data = null, $expire = 0)
+{
+    $res = db_get_one('cache_data', 'id', ['key' => $key]);
+    if ($data === null) {
+        return $res;
+    }
+    if ($res) {
+        db_update('cache_data', ['id' => $res], ['data' => $data, 'expire' => $expire, 'updated_at' => time()]);
+    } else {
+        db_insert('cache_data', [
+            'key' => $key,
+            'data' => $data,
+            'expire' => $expire,
+            'created_at' => time(),
+        ]);
+    }
+}
