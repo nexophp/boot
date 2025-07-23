@@ -17,9 +17,9 @@ function add_user_login_his($user_id)
         'user_id' => $user_id,
         'token' => $token,
         'ip' => get_ip(),
-        'exp' => time() + 86400*7,
         'device' => get_device(),
         'created_at' => time(),
+        'last_time' => time(),
     ]);
     return $token;
 }
@@ -66,7 +66,7 @@ function set_user_openid($openid, $unionid = '', $type = 'weixin', $user_id = nu
         }
         $data['created_at'] = time();
         db_insert("user_openid", $data);
-    } 
+    }
 }
 
 /**
@@ -111,16 +111,23 @@ function set_user_info($user_id, $field, $value)
  */
 function get_user($user_id)
 {
-    $list = db_get("user_info", "*", ["user_id" => $user_id]);
+    if (is_array($user_id)) {
+        $where = $user_id;
+    } else {
+        $where = ['id' => $user_id];
+    }
+    $user = db_get_one('user', "*", $where);
+    if (!$user) {
+        return;
+    }
+    $user_id = $user['id'];
+    $list = db_get("user_info", "*", ['user_id' => $user_id]);
     $info = [];
     if ($list) {
         foreach ($list as $v) {
             $info[$v['field']] = $v['value'];
         }
-    }
-    $user = db_get_one('user', "*", ['id' => $user_id]);
-    if ($user) {
-        $info = array_merge($info, $user);
+        $user = array_merge($info, $user);
     }
     return $info;
 }
@@ -144,7 +151,7 @@ function is_root_admin($uid = '')
     if ($user && $uid == 1) {
         return true;
     }
-} 
+}
 /**
  * 权限验证 同 has_access
  */
