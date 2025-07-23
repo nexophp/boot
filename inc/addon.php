@@ -76,13 +76,13 @@ function include_installed_modules()
 }
 
 /**
- * 加载模块下的nexophp.php
+ * 加载模块下的 auto_include.php
  */
 function get_all_modules()
 {
-    $vendor_list = glob(PATH . '/vendor/*/*/src/nexophp.php');
-    $modules_list = glob(PATH . '/modules/*/nexophp.php');
-    $app_list = glob(PATH . '/app/*/nexophp.php');
+    $vendor_list = glob(PATH . '/vendor/*/*/src/auto_include.php');
+    $modules_list = glob(PATH . '/modules/*/auto_include.php');
+    $app_list = glob(PATH . '/app/*/auto_include.php');
     $list = array_merge($vendor_list, $modules_list, $app_list);
     return $list;
 }
