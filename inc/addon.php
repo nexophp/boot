@@ -8,6 +8,33 @@
  */
 
 /**
+ * 设置用户token
+ */
+function set_user_token($user_id,$secret = '')
+{
+    $token = \lib\Jwt::encode(['user_id' => $user_id, 'time' => time()]);
+    if($secret){
+        $res = db_get_one("user_login", "*", ["user_id" => $user_id, "secret" => $secret]);
+        if($res){
+            db_update("user_login", [
+                'token' => $token,
+            ], [
+                'id' => $res['id'],
+            ]);
+            return ['token' => $token, 'secret' => $secret];
+        }
+    }
+    $secret = $secret?:md5(uniqid());
+    db_insert("user_login", [
+        'user_id' => $user_id,
+        'token' => $token,
+        'secret' => $secret,
+        'ip' => get_ip(),
+        'created_at' => time(),
+    ]);
+    return ['token' => $token, 'secret' => $secret];
+}
+/**
  * 通过 openid 取user_id
  */
 function get_user_info_by_openid($openid, $unionid = '', $type = 'weixin')
