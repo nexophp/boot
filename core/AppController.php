@@ -86,11 +86,10 @@ class AppController
             return [];
         }
         $user_id = $uid;
-        $user = db_get_one('user', '*', ['id' => $uid]);
+        $user = get_user_info($uid);
         if (!$user) {
             return [];
         }
-        $user['password'] = '';
         $this->uid = $this->user_id = $user['id'];
         return $user;
     }

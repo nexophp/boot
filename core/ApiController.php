@@ -17,10 +17,6 @@ class ApiController extends AppController
      */
     protected $need_login = true;
     /**
-     * Token错误时返回json_error信息
-     */
-    protected $show_error = true;
-    /**
      * 初始化
      */
     public function init()
@@ -35,9 +31,9 @@ class ApiController extends AppController
             $uid = $jwt['user_id'] ?? 0;
         }
         if (!$uid) {
-            return;
+            json_error(['msg' => lang('未经许可的访问')]);
         }
-        $user = get_user($uid);
+        $user = get_user_info($uid);
         $this->uid = $this->user_id = $uid;
         $this->user_info = $user;
         do_action('ApiController.init');

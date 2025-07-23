@@ -14,7 +14,6 @@ use Firebase\JWT\JWT as Firebase_JWT;
  */
 function get_authorization($show_error = true)
 {
-	global $config;
 	$sign  = $_SERVER['HTTP_AUTHORIZATION'] ?: g('sign');
 	if (!$sign) {
 		$error = '参数错误';
@@ -22,10 +21,6 @@ function get_authorization($show_error = true)
 	$jwt  = Jwt::decode($sign);
 	if (!$jwt->time) {
 		$error = '缺少time参数';
-	}
-	$exp = $config['jwt_exp_time'] ?: 120;
-	if ($jwt->time + $exp < time()) {
-		$error = 'Token过期';
 	}
 	if ($jwt->user_id) {
 	} else {

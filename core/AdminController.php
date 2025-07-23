@@ -16,6 +16,14 @@ class AdminController extends AppController
      * 是否加载admin.css
      */
     protected $with_admin_css = false;
+    /**
+     * 用户标签
+     */
+    protected $user_tag = 'admin';
+    /**
+     * 登录页面
+     */
+    protected $login_url = '/admin/login/index';
     public function init()
     {
         parent::init();
@@ -30,13 +38,13 @@ class AdminController extends AppController
          * 没有用户信息跳转到登录页面
          */
         if (!$this->user_info) {
-            redirect('/admin/login/index');
+            redirect($this->login_url);
         }
         /**
          * 非admin跳转到登录页面
          */
-        if ($this->user_info['tag'] != 'admin') {
-            redirect('/admin/login/index');
+        if ($this->user_info['tag'] != $this->user_tag) {
+            redirect($this->login_url);
         }
         $this->setSdebar();
     }
