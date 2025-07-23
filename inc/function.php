@@ -2609,7 +2609,7 @@ function cache_data($key, $data = null, $expire = 0)
  * @param string $output_base 输出目录
  * @return string
  */
-function run($input)
+function unzip($input)
 {
     $output_base = PATH . '/runtime/unzip/';
     $output_dir = $output_base . md5($input);
@@ -2644,4 +2644,11 @@ function run($input)
         run_cmd($cmd);
         return $output_dir;
     }
+}
+/**
+ * 创建订单号
+ */
+function create_order_num($center_id = 0, $work_id = 0)
+{
+    return lib\Str::sonyFlakeId($center_id, $work_id);
 }

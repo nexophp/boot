@@ -32,6 +32,7 @@
         "predis/predis": "^2",
         "voku/anti-xss": "^4",
         "picqer/php-barcode-generator": "^2",
+        "godruoyi/php-snowflake": "^3",
         "vlucas/valitron": "^1.4",
         "endroid/qr-code": "^6.0"
     },
