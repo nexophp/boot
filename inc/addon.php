@@ -10,7 +10,7 @@
 /**
  * 通过 openid 取user_id
  */
-function get_user_openid($openid, $unionid = '', $type = 'weixin')
+function get_user_info_by_openid($openid, $unionid = '', $type = 'weixin')
 {
     $where = [
         "openid" => $openid,
@@ -21,7 +21,7 @@ function get_user_openid($openid, $unionid = '', $type = 'weixin')
     }
     $info = db_get_one("user_openid", '*', $where);
     $user_id = $info['user_id'] ?? 0;
-    if(!$user_id){
+    if (!$user_id) {
         return;
     }
     return get_user_info($user_id);
