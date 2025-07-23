@@ -28,39 +28,9 @@ function get_user($uid = '')
 	return db_get_one('user', "*", ['id' => $uid]);
 }
 /**
- * 返回接口AUTHORIZATION解密后数组
- * 返回{user_id:'',time:int}
- */
-function api($show_error = true)
-{
-	static $api_data;
-	if (!$api_data) {
-		if (cookie('uid')) {
-			$user = get_user(cookie('uid'));
-			$user['user_id'] = $user['id'];
-			$api_data = $user;
-		}
-		if (!$api_data) {
-			$api_data = get_author($show_error);
-		}
-	}
-	return $api_data;
-}
-/**
- * 接口是否是管理员
- */
-function api_admin()
-{
-	$arr = api();
-	if ($arr['tag'] != 'admin') {
-		json_error(['msg' => lang('Access Deny')]);
-	}
-}
-
-/**
  * 解析 HTTP_AUTHORIZATION 
  */
-function get_author($show_error = true)
+function get_authorization($show_error = true)
 {
 	global $config;
 	$sign  = $_SERVER['HTTP_AUTHORIZATION'] ?: g('sign');
@@ -96,15 +66,15 @@ class Jwt
 	public static function encode($data, $key = null)
 	{
 		global $config;
-		if (!$key) {
-			$key   = $config['jwt_key'];
-		}
-		$time     = time();
-		$exp_time = time() + 10;
+		$key = $key ?: $config['jwt_key'];
+		$time = time();
+		$jti = bin2hex(random_bytes(16));
 		$payload  = array(
 			"iat" => $time,
 			"nbf" => $time,
-			"exp" => $exp_time,
+			"exp" => time() + 86400,
+			"jti" => $jti,
+			'device' => self::getDeviceFingerprint(),
 		) + $data;
 		$jwt = Firebase_JWT::encode($payload, $key);
 		return base64_encode($jwt);
@@ -114,13 +84,18 @@ class Jwt
 	{
 		global $config;
 		$value   = base64_decode($value);
-		if (!$key) {
-			$key     = $config['jwt_key'];
-		}
+		$key = $key ?: $config['jwt_key'];
 		try {
-			$arr     = Firebase_JWT::decode($value, $key, array('HS256'));
+			$arr = Firebase_JWT::decode($value, $key, array('HS256'));
 			return $arr;
 		} catch (\Exception $e) {
 		}
+	}
+
+	private static function getDeviceFingerprint()
+	{
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+		$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+		return md5($ip . $ua);
 	}
 }

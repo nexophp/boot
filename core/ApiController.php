@@ -12,6 +12,34 @@ namespace core;
 
 class ApiController extends AppController
 {
-
-    public function init() {}
+    /**
+     * 是否需要登录
+     */
+    protected $need_login = true;
+    /**
+     * Token错误时返回json_error信息
+     */
+    protected $show_error = true;
+    /**
+     * 初始化
+     */
+    public function init()
+    {
+        $show_error = $this->show_error;
+        if (!$this->need_login) {
+            $show_error = false;
+        }
+        $uid = cookie('uid');
+        if (!$uid) {
+            $jwt = get_authorization($show_error);
+            $uid = $jwt['user_id'] ?? 0;
+        }
+        if (!$uid) {
+            return;
+        }
+        $user = get_user($uid);
+        $this->uid = $this->user_id = $uid;
+        $this->user_info = $user;
+        do_action('ApiController.init');
+    }
 }
