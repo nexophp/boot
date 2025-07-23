@@ -20,7 +20,11 @@ function get_user_openid($openid, $unionid = '', $type = 'weixin')
         $where['unionid'] = $unionid;
     }
     $info = db_get_one("user_openid", '*', $where);
-    return $info['user_id'] ?? 0;
+    $user_id = $info['user_id'] ?? 0;
+    if(!$user_id){
+        return;
+    }
+    return get_user_info($user_id);
 }
 /**
  * 设置用户openid
