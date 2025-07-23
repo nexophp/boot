@@ -8,31 +8,20 @@
  */
 
 /**
- * 设置用户token
+ * 记录用户登录信息
  */
-function set_user_token($user_id,$secret = '')
+function add_user_login_his($user_id)
 {
     $token = \lib\Jwt::encode(['user_id' => $user_id, 'time' => time()]);
-    if($secret){
-        $res = db_get_one("user_login", "*", ["user_id" => $user_id, "secret" => $secret]);
-        if($res){
-            db_update("user_login", [
-                'token' => $token,
-            ], [
-                'id' => $res['id'],
-            ]);
-            return ['token' => $token, 'secret' => $secret];
-        }
-    }
-    $secret = $secret?:md5(uniqid());
     db_insert("user_login", [
         'user_id' => $user_id,
         'token' => $token,
-        'secret' => $secret,
         'ip' => get_ip(),
+        'exp' => time() + 86400*7,
+        'device' => get_device(),
         'created_at' => time(),
     ]);
-    return ['token' => $token, 'secret' => $secret];
+    return $token;
 }
 /**
  * 通过 openid 取user_id
@@ -51,7 +40,7 @@ function get_user_info_by_openid($openid, $unionid = '', $type = 'weixin')
     if (!$user_id) {
         return;
     }
-    return get_user_info($user_id);
+    return get_user($user_id);
 }
 /**
  * 设置用户openid
@@ -77,7 +66,7 @@ function set_user_openid($openid, $unionid = '', $type = 'weixin', $user_id = nu
         }
         $data['created_at'] = time();
         db_insert("user_openid", $data);
-    }
+    } 
 }
 
 /**
@@ -120,7 +109,7 @@ function set_user_info($user_id, $field, $value)
 /**
  * 获取用户信息
  */
-function get_user_info($user_id)
+function get_user($user_id)
 {
     $list = db_get("user_info", "*", ["user_id" => $user_id]);
     $info = [];
@@ -129,7 +118,7 @@ function get_user_info($user_id)
             $info[$v['field']] = $v['value'];
         }
     }
-    $user = get_user($user_id);
+    $user = db_get_one('user', "*", ['id' => $user_id]);
     if ($user) {
         $info = array_merge($info, $user);
     }
@@ -155,16 +144,7 @@ function is_root_admin($uid = '')
     if ($user && $uid == 1) {
         return true;
     }
-}
-/**
- * 获取用户信息
- */
-function get_user($uid = '')
-{
-    $uid = $uid ?: cookie('uid');
-    return db_get_one('user', "*", ['id' => $uid]);
-}
-
+} 
 /**
  * 权限验证 同 has_access
  */

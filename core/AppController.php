@@ -39,7 +39,6 @@ class AppController
      */
     protected $user_id = '';
     protected $uid     = '';
-    protected $token;
     /**
      * 是否是api请求，仅当api请求时获取getHttpAuth
      */
@@ -88,7 +87,7 @@ class AppController
         global $uid, $user_id;
         $uid = cookie('uid');
         if (!$uid) {
-            if($this->is_api){
+            if ($this->is_api) {
                 $uid = $this->getHttpAuth();
             }
             if (!$uid) {
@@ -96,7 +95,7 @@ class AppController
             }
         }
         $user_id = $uid;
-        $user = get_user_info($uid);
+        $user = get_user($uid);
         if (!$user) {
             return [];
         }
@@ -137,7 +136,9 @@ class AppController
         if (!$res) {
             return '';
         }
+        db_update("user_login", ['last_time' => time()], ['id' => $res['id']]);
         if ($exp < time()) {
+            global $token;
             //刷新token,让老token失效
             $token = \lib\Jwt::encode(['user_id' => $user_id, 'time' => time()]);
             db_update("user_login", [
@@ -145,7 +146,6 @@ class AppController
             ], [
                 'id' => $res['id'],
             ]);
-            $this->token = $token;
         }
         return $user_id;
     }

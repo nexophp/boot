@@ -27,9 +27,9 @@ class Jwt
 		$payload  = array(
 			"iat" => $time,
 			"nbf" => $time,
-			"exp" => time() + 86400,
+			"exp" => time() + 86400*7,
 			"jti" => $jti,
-			'device' => self::getDevice(),
+			'device' => get_device(),
 		) + $data;
 		$jwt = Firebase_JWT::encode($payload, $key);
 		return base64_encode($jwt);
@@ -46,11 +46,5 @@ class Jwt
 		} catch (\Exception $e) {
 		}
 	}
-
-	private static function getDevice()
-	{
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
-		$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-		return md5($ip . $ua);
-	}
+ 
 }

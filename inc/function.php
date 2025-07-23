@@ -1120,6 +1120,10 @@ function price_format($yuan, $dot = 2)
  */
 function json_error($arr = [])
 {
+    global $token;
+    if ($token) {
+        $arr['data']['token'] = $token;
+    }
     $arr['code'] = $arr['code'] ?: 250;
     $arr['type'] = $arr['type'] ?: 'error';
     return json($arr);
@@ -1129,6 +1133,10 @@ function json_error($arr = [])
  */
 function json_success($arr = [])
 {
+    global $token;
+    if ($token) {
+        $arr['data']['token'] = $token;
+    }
     $arr['code'] = $arr['code'] ?: 0;
     $arr['type'] = $arr['type'] ?: 'success';
     return json($arr);
@@ -2491,14 +2499,14 @@ function create_new_url($url)
  * @param string $module 模块名
  * @param string $module_dir 模块目录
  */
-function publish_assets($module,$module_dir)
+function publish_assets($module, $module_dir)
 {
     if (!is_local()) {
         return;
     }
     /**
      * 复制assets下文件到PATH.'/public/assets/模块名/
-     */ 
+     */
     $assets = PATH . '/public/assets/' . $module . '/';
     $src = $module_dir . '/assets/';
     /**
@@ -2605,7 +2613,8 @@ function cache_data($key, $data = null, $expire = 0)
 /**
  * 删除数据库缓存数据
  */
-function cache_data_delete($key){
+function cache_data_delete($key)
+{
     db_delete('cache_data', ['key' => $key]);
 }
 /**
@@ -2656,4 +2665,12 @@ function unzip($input)
 function create_order_num($center_id = 0, $work_id = 0)
 {
     return lib\Str::sonyFlakeId($center_id, $work_id);
+}
+/**
+ * 获取设备信息
+ */
+function get_device()
+{
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    return $ua;
 }
