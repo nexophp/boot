@@ -47,10 +47,9 @@ class Str
 		$key = $center_id . $work_id;
 		if (!$snowflake_obj[$key]) {
 			$start_date  = $config['sony_flake'] ?: "2025-07-01";
-			$redis = predis();
 			$snowflake = new \Godruoyi\Snowflake\Sonyflake($center_id, $work_id);
 			$snowflake->setStartTimeStamp(strtotime(date($start_date)) * 1000)
-				->setSequenceResolver(new \Godruoyi\Snowflake\RedisSequenceResolver($redis));
+				->setSequenceResolver(new \Godruoyi\Snowflake\PredisSequenceResolver(predis()));
 			$snowflake_obj[$key] = $snowflake;
 		}
 		$id = $snowflake_obj[$key]->id();
