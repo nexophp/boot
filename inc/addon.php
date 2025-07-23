@@ -8,6 +8,123 @@
  */
 
 /**
+ * 通过 openid 取user_id
+ */
+function get_user_openid($openid, $unionid = '', $type = 'weixin')
+{
+    $where = [
+        "openid" => $openid,
+        "type" => $type,
+    ];
+    if ($unionid) {
+        $where['unionid'] = $unionid;
+    }
+    $info = db_get_one("user_openid", '*', $where);
+    return $info['user_id'] ?? 0;
+}
+/**
+ * 设置用户openid
+ */
+function set_user_openid($openid, $unionid = '', $type = 'weixin', $user_id = null)
+{
+    $where = [
+        "openid" => $openid,
+        "type" => $type,
+    ];
+    if ($unionid) {
+        $where['unionid'] = $unionid;
+    }
+    $info = db_get_one("user_openid", '*', $where);
+    if ($info) {
+        if ($user_id) {
+            db_update("user_openid",   ["user_id" => $user_id, "updated_at" => time()], ["id" => $info['id']]);
+        }
+    } else {
+        $data = $where;
+        if ($user_id) {
+            $data['user_id'] = $user_id;
+        }
+        $data['created_at'] = time();
+        db_insert("user_openid", $data);
+    }
+}
+
+/**
+ * 设置扩展字段
+ */
+function set_data_info($node_id, $node_type, $field, $value)
+{
+    $info = db_get_one("data_info", "*", ["node_id" => $node_id, "node_type" => $node_type, "field" => $field]);
+    if ($info) {
+        db_update("data_info", ["id" => $info['id']], ["value" => $value]);
+    } else {
+        db_insert("data_info", ["node_id" => $node_id, "node_type" => $node_type, "field" => $field, "value" => $value]);
+    }
+}
+/**
+ * 取扩展字段
+ */
+function get_data_info($node_id, $node_type)
+{
+    $info = db_get_one("data_info", "*", ["node_id" => $node_id, "node_type" => $node_type]);
+    if ($info) {
+        return $info['value'];
+    }
+    return '';
+}
+
+/**
+ * 设置用户信息
+ */
+function set_user_info($user_id, $field, $value)
+{
+    $info = db_get_one("user_info", "*", ["user_id" => $user_id, "field" => $field]);
+    if ($info) {
+        db_update("user_info", ["id" => $info['id']], ["value" => $value]);
+    } else {
+        db_insert("user_info", ["user_id" => $user_id, "field" => $field, "value" => $value]);
+    }
+}
+
+/**
+ * 获取用户信息
+ */
+function get_user_info($user_id)
+{
+    $list = db_get("user_info", "*", ["user_id" => $user_id]);
+    $info = [];
+    if ($list) {
+        foreach ($list as $v) {
+            $info[$v['field']] = $v['value'];
+        }
+    }
+    $user = get_user($user_id);
+    if ($user) {
+        $info = array_merge($info, $user);
+    }
+    return $info;
+}
+
+/**
+ * 是否是管理员
+ */
+function is_admin($uid = '')
+{
+    $user = get_user($uid);
+    if ($user && $user['tag'] == 'admin') {
+        return true;
+    }
+}
+/**
+ * 获取用户信息
+ */
+function get_user($uid = '')
+{
+    $uid = $uid ?: cookie('uid');
+    return db_get_one('user', "*", ['id' => $uid]);
+}
+
+/**
  * 权限验证 同 has_access
  */
 function if_access($str)

@@ -10,24 +10,6 @@
 use Firebase\JWT\JWT as Firebase_JWT;
 
 /**
- * 是否是管理员
- */
-function is_admin($uid = '')
-{
-	$user = get_user($uid);
-	if ($user && $user['tag'] == 'admin') {
-		return true;
-	}
-}
-/**
- * 获取用户信息
- */
-function get_user($uid = '')
-{
-	$uid = $uid ?: cookie('uid');
-	return db_get_one('user', "*", ['id' => $uid]);
-}
-/**
  * 解析 HTTP_AUTHORIZATION 
  */
 function get_authorization($show_error = true)
