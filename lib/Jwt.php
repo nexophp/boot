@@ -1,5 +1,7 @@
 <?php
 
+namespace lib;
+
 /**
  * JWT 
  * @author sunkangchina <68103403@qq.com>
@@ -9,30 +11,6 @@
 
 use Firebase\JWT\JWT as Firebase_JWT;
 
-/**
- * 解析 HTTP_AUTHORIZATION 
- */
-function get_authorization($show_error = true)
-{
-	$sign  = $_SERVER['HTTP_AUTHORIZATION'] ?: g('sign');
-	if (!$sign) {
-		$error = '参数错误';
-	}
-	$jwt  = Jwt::decode($sign);
-	if (!$jwt->time) {
-		$error = '缺少time参数';
-	}
-	if ($jwt->user_id) {
-	} else {
-		$error = '错误user_id参数';
-	}
-	if ($error) {
-		if ($show_error) {
-			json_error(['msg' => lang($error)]);
-		}
-	}
-	return (array)$jwt;
-}
 
 /**
  * $s = Jwt::encode(['user_id'=>100,'t'=>['s'=>2]]);
@@ -51,7 +29,7 @@ class Jwt
 			"nbf" => $time,
 			"exp" => time() + 86400,
 			"jti" => $jti,
-			'device' => self::getDeviceFingerprint(),
+			'device' => self::getDevice(),
 		) + $data;
 		$jwt = Firebase_JWT::encode($payload, $key);
 		return base64_encode($jwt);
@@ -69,7 +47,7 @@ class Jwt
 		}
 	}
 
-	private static function getDeviceFingerprint()
+	private static function getDevice()
 	{
 		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
 		$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';

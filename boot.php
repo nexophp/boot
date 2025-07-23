@@ -45,7 +45,6 @@ $autoload = require PATH . '/vendor/autoload.php';
 $autoload->addPsr4('app\\', PATH . '/app/');
 $autoload->addPsr4('modules\\', PATH . '/modules/'); 
 require __DIR__ . '/inc/function.php';
-require __DIR__ . '/inc/jwt.php';
 require __DIR__ . '/inc/request.php';
 /**
  * TRIM

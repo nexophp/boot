@@ -120,6 +120,16 @@ function is_admin($uid = '')
     }
 }
 /**
+ * 是否是超管
+ */
+function is_root_admin($uid = '')
+{
+    $user = get_user($uid);
+    if ($user && $uid == 1) {
+        return true;
+    }
+}
+/**
  * 获取用户信息
  */
 function get_user($uid = '')

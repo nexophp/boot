@@ -39,6 +39,11 @@ class AppController
      */
     protected $user_id = '';
     protected $uid     = '';
+    protected $token;
+    /**
+     * 是否是api请求，仅当api请求时获取getHttpAuth
+     */
+    protected $is_api = false;
     /**
      * 构造函数 
      */
@@ -83,7 +88,12 @@ class AppController
         global $uid, $user_id;
         $uid = cookie('uid');
         if (!$uid) {
-            return [];
+            if($this->is_api){
+                $uid = $this->getHttpAuth();
+            }
+            if (!$uid) {
+                return [];
+            }
         }
         $user_id = $uid;
         $user = get_user_info($uid);
@@ -92,6 +102,52 @@ class AppController
         }
         $this->uid = $this->user_id = $user['id'];
         return $user;
+    }
+    /**
+     * 获取HTTP认证信息
+     */
+    protected function getHttpAuth()
+    {
+        $author = $_SERVER['HTTP_AUTHORIZATION'];
+        if (!$author) {
+            return '';
+        }
+        if (strpos($author, 'Bearer') !== false) {
+            $author = substr($author, 7);
+            $author = trim($author);
+        }
+        if (!$author) {
+            return '';
+        }
+        $decode = \lib\Jwt::decode($author);
+        if (!$decode) {
+            return '';
+        }
+        $user_id = $decode->user_id;
+        if (!$user_id) {
+            return '';
+        }
+        $device = $decode->device;
+        $exp = $decode->exp;
+        $res = db_get_one("user_login", '*', [
+            'user_id' => $user_id,
+            'token' => $author,
+            'device' => $device,
+        ]);
+        if (!$res) {
+            return '';
+        }
+        if ($exp < time()) {
+            //刷新token,让老token失效
+            $token = \lib\Jwt::encode(['user_id' => $user_id, 'time' => time()]);
+            db_update("user_login", [
+                'token' => $token,
+            ], [
+                'id' => $res['id'],
+            ]);
+            $this->token = $token;
+        }
+        return $user_id;
     }
     /**
      * 加载语言包

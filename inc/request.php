@@ -109,12 +109,15 @@ function g($key = null)
 /**
  * 取php://input值
  */
-function get_input()
+function get_input($key = '')
 {
     $data = file_get_contents("php://input");
     if (is_json($data)) {
         $data = json_decode($data, true);
         global_trim_inner($data);
+    }
+    if($key){
+        return $data[$key];
     }
     return $data;
 }
