@@ -2488,16 +2488,17 @@ function create_new_url($url)
 }
 /**
  * 定义 assets 发布模块下的资源
+ * @param string $module 模块名
+ * @param string $module_dir 模块目录
  */
-function publish_assets($module_dir)
+function publish_assets($module,$module_dir)
 {
     if (!is_local()) {
         return;
     }
     /**
      * 复制assets下文件到PATH.'/public/assets/模块名/
-     */
-    $module = basename(__DIR__);
+     */ 
     $assets = PATH . '/public/assets/' . $module . '/';
     $src = $module_dir . '/assets/';
     /**
