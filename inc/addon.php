@@ -15,7 +15,7 @@ function add_user_login_his($user_id)
     $token = \lib\Jwt::encode(['user_id' => $user_id, 'time' => time()]);
     db_insert("user_login", [
         'user_id' => $user_id,
-        'token' => $token,
+        'token' => md5($token),
         'ip' => get_ip(),
         'device' => get_device(),
         'created_at' => time(),
@@ -115,7 +115,7 @@ function get_user($user_id)
         $where = $user_id;
     } else {
         $where = ['id' => $user_id];
-    }
+    } 
     $user = db_get_one('user', "*", $where);
     if (!$user) {
         return;
@@ -129,7 +129,7 @@ function get_user($user_id)
         }
         $user = array_merge($info, $user);
     }
-    return $info;
+    return $user;
 }
 
 /**

@@ -130,7 +130,7 @@ class AppController
         $exp = $decode->exp;
         $res = db_get_one("user_login", '*', [
             'user_id' => $user_id,
-            'token' => $author,
+            'token' => md5($author),
             'device' => $device,
         ]);
         if (!$res) {
