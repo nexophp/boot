@@ -100,6 +100,12 @@ class Upload
 
         if (self::$db) {
             $data = db_get_one('upload', '*', ['hash' => $md5]);
+            if(!db_get_one('upload_user','*',['user_id'=>$user_id,'hash'=>$md5])){
+                $new_data = $data;
+                $new_data['user_id'] = $user_id;
+                unset($new_data['id']);
+                db_insert('upload_user',$new_data);
+            }
             if ($data) {
                 goto Success;
             }
@@ -123,6 +129,7 @@ class Upload
 
             if (self::$db) {
                 $id = db_insert('upload', $insert);
+                db_insert('upload_user',$insert);
                 $data = db_get_one('upload', '*', ['id' => $id]);
             } else {
                 $data = $insert;
