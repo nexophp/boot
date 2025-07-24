@@ -10,11 +10,13 @@
 namespace core;
 
 
-class AppModel
+class AppModel extends \DbModel
 {
-    public function __construct()
+    protected $user_id;
+    protected $uid;
+    public function init()
     {
-        $this->init();
+        global $uid;
+        $this->user_id = $this->uid = $uid;
     }
-    public function init() {}
 }
