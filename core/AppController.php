@@ -69,7 +69,7 @@ class AppController
     /**
      * 初始化
      */
-    public function init()
+    protected function init()
     {
         $this->_loadAssets();
         $this->_loadLang();

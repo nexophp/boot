@@ -24,7 +24,7 @@ class AdminController extends AppController
      * 登录页面
      */
     protected $login_url = '/admin/login/index';
-    public function init()
+    protected function init()
     {
         parent::init();
         /**

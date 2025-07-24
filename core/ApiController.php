@@ -20,7 +20,7 @@ class ApiController extends AppController
     /**
      * 初始化
      */
-    public function init()
+    protected function init()
     {  
         parent::init();
         do_action('ApiController.init');
