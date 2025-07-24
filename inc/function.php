@@ -2683,3 +2683,16 @@ function get_device()
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
     return $ua;
 }
+/**
+ * 获取首页路由
+ * Route::all('/', function () { 
+ *   return get_home_route();
+ * });
+ * //设置首页路由
+ * set_config('home_class','app\site\controller\siteController');
+ */
+function get_home_route()
+{
+    $homeClass = get_config('home_class') ?: 'app\site\controller\siteController';
+    return Route::runController($homeClass, 'actionIndex');
+}
