@@ -199,8 +199,7 @@ class AppController
         add_js("/misc/js/file-saver.js");
         add_js("/misc/js/xlsx.js");
         add_js("/misc/wangeditor/index.js");
-        add_css("/misc/wangeditor/css/style.css"); 
-        add_js("/misc/ckeditor5/ckeditor5.uploader.js");
+        add_css("/misc/wangeditor/css/style.css");  
         add_css("/misc/ckeditor5/ckeditor5.css");
 
         add_js("/misc/js/app.js"); 
