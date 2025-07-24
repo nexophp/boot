@@ -46,6 +46,7 @@ $autoload->addPsr4('app\\', PATH . '/app/');
 $autoload->addPsr4('modules\\', PATH . '/modules/'); 
 require __DIR__ . '/inc/function.php';
 require __DIR__ . '/inc/request.php';
+require __DIR__ . '/inc/vue.php';
 /**
  * TRIM
  */
