@@ -201,15 +201,14 @@ class AppController
         add_js("/misc/wangeditor/index.js");
         add_css("/misc/wangeditor/css/style.css");  
         add_css("/misc/ckeditor5/ckeditor5.css");
-
+        add_js("/misc/ckeditor5/ckeditor5.umd.js"); 
         add_js("/misc/js/app.js"); 
 
         add_css('/misc/select2/css/select2.min.css');
         add_css("/misc/bs5/css/bootstrap.min.css");
         add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
         add_css("/misc/element-ui/default/index.css");
-        add_css("/misc/layui/css/layui.css");
-
+        add_css("/misc/layui/css/layui.css"); 
         add_css("/misc/css/app.css");
     }
 }
