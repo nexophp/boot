@@ -2424,13 +2424,22 @@ function array_order_by()
  */
 function get_browser_lang()
 {
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $ua = $_SERVER['HTTP_USER_AGENT'];
+        if (preg_match('/Language\/([a-z]{2}_[A-Z]{2})/i', $ua, $matches)) {
+            $lang =  strtolower($matches[1]);
+            if($lang == 'zh_cn'){
+                $lang = 'zh-cn';
+            }
+            return $lang;
+        }
+    }
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
         $langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-        $firstLang = explode(';', $langs[0])[0]; // 获取第一个语言代码
-        return strtolower($firstLang); // 转换为全小写 
-    } else {
-        return 'en';
+        $firstLang = trim(explode(';', $langs[0])[0]);
+        return strtolower($firstLang);
     }
+    return 'en';
 }
 
 /**
