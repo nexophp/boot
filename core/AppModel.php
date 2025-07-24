@@ -14,7 +14,7 @@ class AppModel extends \DbModel
 {
     protected $user_id;
     protected $uid;
-    public function init()
+    protected function init()
     {
         global $uid;
         $this->user_id = $this->uid = $uid;
