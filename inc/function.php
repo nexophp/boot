@@ -1376,8 +1376,18 @@ function aes_decode($data, $key = '', $iv = '', $type = 'AES-128-CBC', $options 
  */
 function set_lang($lang = 'zh-cn')
 {
+    global $config;
+    $config['_lang'] = $lang;
     lib\Lang::set($lang);
     lib\Validate::lang($lang);
+}
+/**
+ * 获取当前语言
+ */
+function get_lang()
+{
+    global $config;
+    return $config['_lang'];
 }
 /**
  * 多语言
@@ -2428,7 +2438,7 @@ function get_browser_lang()
         $ua = $_SERVER['HTTP_USER_AGENT'];
         if (preg_match('/Language\/([a-z]{2}_[A-Z]{2})/i', $ua, $matches)) {
             $lang =  strtolower($matches[1]);
-            if($lang == 'zh_cn'){
+            if ($lang == 'zh_cn') {
                 $lang = 'zh-cn';
             }
             return $lang;
