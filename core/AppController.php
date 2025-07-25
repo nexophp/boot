@@ -44,6 +44,10 @@ class AppController
      */
     protected $is_api = false;
     /**
+     * 模型
+     */
+    protected $model;
+    /**
      * 构造函数 
      */
     public function __construct()
@@ -52,6 +56,17 @@ class AppController
         $this->input_data = get_input() ?: [];
         $this->actions = Route::getActions();
         $this->init();
+        if ($this->model) {
+            $model = $this->model;
+            $this->model = (object)[];
+            if (is_array($model)) {
+                foreach ($model as $key => $value) {
+                    $this->model->$key = new $value();
+                }
+            } else {
+                $this->model = new $model();
+            }
+        }
     }
     /**
      * 取当前用户权限 
@@ -199,17 +214,17 @@ class AppController
         add_js("/misc/js/file-saver.js");
         add_js("/misc/js/xlsx.js");
         add_js("/misc/wangeditor/index.js");
-        add_css("/misc/wangeditor/css/style.css");   
-        add_js("/misc/js/app.js"); 
+        add_css("/misc/wangeditor/css/style.css");
+        add_js("/misc/js/app.js");
 
         add_css('/misc/select2/css/select2.min.css');
         add_css("/misc/bs5/css/bootstrap.min.css");
         add_css("/misc/bootstrap-icons/font/bootstrap-icons.min.css");
         add_css("/misc/element-ui/default/index.css");
-        add_css("/misc/layui/css/layui.css"); 
+        add_css("/misc/layui/css/layui.css");
         add_css("/misc/css/app.css");
 
-        add_action("content",function(){
+        add_action("content", function () {
             element_vue();
         });
     }
