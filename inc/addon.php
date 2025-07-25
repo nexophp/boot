@@ -327,6 +327,9 @@ function view_header($title)
     <body>
         <div id='app' v-cloak>
         <?php
+        do_action('content');
+        ?>
+        <?php
     }
     /**
      * 视图页脚

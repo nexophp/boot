@@ -208,5 +208,9 @@ class AppController
         add_css("/misc/element-ui/default/index.css");
         add_css("/misc/layui/css/layui.css"); 
         add_css("/misc/css/app.css");
+
+        add_action("content",function(){
+            element_vue();
+        });
     }
 }
