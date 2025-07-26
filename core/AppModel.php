@@ -45,7 +45,7 @@ class AppModel extends \DbModel implements \ArrayAccess
      */
     public function offsetExists($offset): bool
     {
-        return isset($this->data[$offset]);
+        return isset($this->data[$offset]) || array_key_exists($offset, $this->has_one) || array_key_exists($offset, $this->has_many);
     }
 
     /**
@@ -55,12 +55,15 @@ class AppModel extends \DbModel implements \ArrayAccess
      */
     public function offsetGet($offset): mixed
     {
-        // 尝试多种命名格式调用 getAttrXxx 方法
+        if (isset($this->has_one[$offset]) || isset($this->has_many[$offset])) {
+            return $this->getRelation($offset);
+        }
+
         $method = $this->resolveGetterMethod($offset);
         if ($method && method_exists($this, $method)) {
             return $this->$method();
         }
-        // 回退到 data 数组
+
         return $this->data[$offset] ?? null;
     }
 
@@ -90,12 +93,15 @@ class AppModel extends \DbModel implements \ArrayAccess
      */
     public function __get($name)
     {
-        // 尝试多种命名格式调用 getAttrXxx 方法
+        if (isset($this->has_one[$name]) || isset($this->has_many[$name])) {
+            return $this->getRelation($name);
+        }
+
         $method = $this->resolveGetterMethod($name);
         if ($method && method_exists($this, $method)) {
             return $this->$method();
         }
-        // 回退到 data 数组
+
         return $this->data[$name] ?? null;
     }
 
@@ -110,26 +116,66 @@ class AppModel extends \DbModel implements \ArrayAccess
     }
 
     /**
+     * 获取关联数据
+     * @param string $name 关联字段名
+     * @return mixed 关联数据
+     */
+    protected function getRelation($name)
+    {
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+
+        $data = $this->data;
+        if (!$this->ignore_relation) {
+            $this->doRelation($data);
+        }
+
+        if (isset($this->has_one[$name])) {
+            $relationData = $data[$name] ?? null;
+            if ($relationData && is_array($relationData)) {
+                $modelClass = $this->has_one[$name][0];
+                $model = new $modelClass();
+                $model->data = $relationData;
+                $this->data[$name] = $model;
+            } else {
+                $this->data[$name] = null;
+            }
+        } elseif (isset($this->has_many[$name])) {
+            $relationData = $data[$name] ?? [];
+            $models = [];
+            if (is_array($relationData)) {
+                $modelClass = $this->has_many[$name][0];
+                foreach ($relationData as $row) {
+                    $model = new $modelClass();
+                    $model->data = is_array($row) ? $row : (array)$row;
+                    $models[] = $model;
+                }
+            }
+            $this->data[$name] = $models;
+        }
+
+        return $this->data[$name] ?? null;
+    }
+
+    /**
      * 解析属性名到 getter 方法名
      * @param string $name 属性名（如 demo_test、demotest、DemoTest）
      * @return string|null getter 方法名（如 getAttrDemoTest）
      */
     protected function resolveGetterMethod($name)
     {
-        // 原始名称直接尝试
         $method = 'getAttr' . ucfirst($name);
         if (method_exists($this, $method)) {
             return $method;
         }
 
-        // 下划线转驼峰（demo_test -> DemoTest）
         $camelCase = str_replace('_', '', ucwords($name, '_'));
         $method = 'getAttr' . $camelCase;
         if (method_exists($this, $method)) {
             return $method;
         }
 
-        // 驼峰格式，首字母小写（demotest -> Demotest）
         $method = 'getAttr' . ucfirst(strtolower($name));
         if (method_exists($this, $method)) {
             return $method;
@@ -139,7 +185,7 @@ class AppModel extends \DbModel implements \ArrayAccess
     }
 
     /**
-     * 查询记录，重写以支持对象化返回
+     * 查询记录，重写以支持对象化返回数据和关联
      * @param mixed $where 查询条件
      * @param mixed $limit 限制条数
      * @param bool $use_select 是否使用原生查询
@@ -148,6 +194,10 @@ class AppModel extends \DbModel implements \ArrayAccess
      */
     public function find($where = '', $limit = '', $use_select = false, $ignore_hook = false)
     {
+        if (is_numeric($where)) {
+            $limit = 1;
+        }
+
         $results = parent::find($where, $limit, $use_select, $ignore_hook);
 
         if (empty($results)) {
@@ -171,7 +221,7 @@ class AppModel extends \DbModel implements \ArrayAccess
     }
 
     /**
-     * 分页查询，重写以支持对象化返回
+     * 分页查询，重写以支持对象化返回数据和关联
      * @param mixed $join 关联查询条件
      * @param mixed $columns 查询字段
      * @param mixed $where 查询条件
