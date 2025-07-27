@@ -31,6 +31,7 @@ function vue_upload_files($name = 'files', $top = 'form', $mime = '', $max_files
         });
         
         parentVue.\$set(parentVue.{$top}, '{$name}', currentFiles);
+        parentVue.\$forceUpdate();
     ");
 
     // 注册Vue方法（增加上传前校验）
@@ -149,7 +150,7 @@ for(let i = 0; i < data.length; i++){
     value.push(data[i].url);
 }
 parentVue.\$set(parentVue." . $top . ", '" . $name . "', value);
-
+parentVue.\$forceUpdate();
 ";
     $js = aes_encode($js);
     $vue->data("vue_upload_name" . $name, "");
@@ -201,6 +202,7 @@ function vue_upload_image($name = 'image', $top = 'form', $show_del = false)
     $js = "
         parent.layer.closeAll();
         parentVue.\$set(parentVue." . $top . ", '" . $name . "', data.url);
+        parentVue.\$forceUpdate();
     ";
     $js = aes_encode($js);
 
