@@ -2603,6 +2603,16 @@ function remove_http($url)
     return $url;
 }
 /**
+ * 数组添加域名
+ */
+function array_add_domain($arr)
+{
+    foreach ($arr as $k => $v) {
+        $arr[$k] = cdn() . $v;
+    }
+    return $arr;
+}
+/**
  * 数据库缓存数据
  */
 function cache_data($key, $data = null, $expire = 0)
