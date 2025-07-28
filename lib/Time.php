@@ -140,7 +140,7 @@ class Time
             $list = [];
             foreach ($arr as $k => $v) {
                 $a = strtotime($v[0]);
-                $b = strtotime($v[1]) - 86400;
+                $b = strtotime($v[1]);
                 if ($date_format) {
                     $a = date('Y-m-d 00:00:00', $a);
                     $b = date('Y-m-d 23:59:59', $b);
@@ -153,7 +153,7 @@ class Time
         if ($data) {
             $ret = [
                 strtotime($data[0]),
-                strtotime($data[1]) - 86400,
+                strtotime($data[1]),
             ];
             if ($date_format) {
                 $ret = [
