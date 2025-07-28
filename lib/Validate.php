@@ -13,16 +13,24 @@ namespace lib;
 /**
  * https://github.com/vlucas/valitron 
  */
-
-
-/**
- * 
- * $lang = 'zh-cn';
- * lib\Validate::lang($lang);
- * lib\Validate::langDir(__DIR__.'/validator_lang');
- */
+ 
 class Validate extends \Valitron\Validator
 {
+
+    public function __construct($data = array(), $fields = array(), $lang = null, $langDir = null)
+    {
+        global $config; 
+        $this->_fields = !empty($fields) ? array_intersect_key($data, array_flip($fields)) : $data; 
+        $lang = $config['_lang']; 
+        $langDir = $langDir ?: static::langDir(); 
+        $langFile = rtrim($langDir, '/') . '/' . $lang . '.php';
+        if (stream_resolve_include_path($langFile)) {
+            $langMessages = include $langFile;
+            static::$_ruleMessages = array_merge(static::$_ruleMessages, $langMessages);
+        } else {
+            throw new \InvalidArgumentException("Fail to load language file '" . $langFile . "'");
+        }
+    }
 
     public function errors($field = null)
     {
