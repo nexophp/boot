@@ -2714,5 +2714,6 @@ function get_device()
 function get_home_route()
 {
     $homeClass = get_config('home_class') ?: 'app\site\controller\siteController';
+    $homeClass = str_replace("/","\\",$homeClass);
     return Route::runController($homeClass, 'actionIndex');
 }
