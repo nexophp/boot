@@ -228,7 +228,7 @@ function include_installed_modules()
  */
 function get_all_modules()
 {
-    $vendor_list = glob(PATH . '/vendor/*/*/src/auto_include.php');
+    $vendor_list = glob(PATH . '/vendor/*/*/auto_include.php');
     $modules_list = glob(PATH . '/modules/*/auto_include.php');
     $app_list = glob(PATH . '/app/*/auto_include.php');
     $list = array_merge($vendor_list, $modules_list, $app_list);
