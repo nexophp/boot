@@ -11,6 +11,7 @@ namespace core;
 
 class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
 {
+    private static $_instance;
     /**
      * 用户ID
      * @var mixed
@@ -349,5 +350,14 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
         }
 
         return $data;
+    }
+
+    public static function model()
+    {
+        $name = get_called_class();
+        if (!isset(self::$_instance[$name])) {
+            self::$_instance[$name] = new static();
+        }
+        return self::$_instance[$name];
     }
 }
