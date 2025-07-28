@@ -2713,7 +2713,11 @@ function get_device()
  */
 function get_home_route()
 {
-    $homeClass = get_config('home_class') ?: 'app\site\controller\SiteController';
-    $homeClass = str_replace("/","\\",$homeClass);
+    try {
+        $homeClass = get_config('home_class');
+    } catch (\Exception $e) {
+    }
+    $homeClass = $homeClass ?: 'app\site\controller\SiteController';
+    $homeClass = str_replace("/", "\\", $homeClass);
     return Route::runController($homeClass, 'actionIndex');
 }

@@ -87,8 +87,11 @@ class AppController
     protected function init()
     {
         $this->_loadAssets();
-        $this->_loadLang();
-        $this->user_info = $this->getUserInfo();
+        try {
+            $this->_loadLang();
+            $this->user_info = $this->getUserInfo();
+        } catch (\Throwable $th) {
+        }
         /**
          * 基类控制器HOOK
          */

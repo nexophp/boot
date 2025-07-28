@@ -201,7 +201,10 @@ function has_access($str)
 /**
  * 包含已安装的模块
  */
-include_installed_modules();
+try{
+    include_installed_modules();
+}catch(\Exception $e){ 
+}
 function include_installed_modules()
 {
     $module_info = get_all_modules();
