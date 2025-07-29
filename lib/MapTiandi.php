@@ -43,7 +43,7 @@ class MapTiandi
     /**
      * 根据lat lng取地址
      */
-    public static function get_address($lat, $lng)
+    public static function getAddress($lat, $lng)
     {
         $url = "http://api.tianditu.gov.cn/geocoder?postStr={'lon':" . $lng . ",'lat':" . $lat . ",'ver':1}&type=geocode&tk=" . self::get_tk();
         $data = self::get($url);
@@ -64,14 +64,14 @@ class MapTiandi
     /**
      * 根据地址取lat lng
      */
-    public static function get_lat($address)
+    public static function getLat($address)
     {
         $url = 'http://api.tianditu.gov.cn/geocoder?ds={"keyWord":"' . $address . '"}&tk=' . self::get_tk();
         $data = self::get($url);
         if ($data['status'] == 0) {
             $lat = $data['location']['lat'];
             $lng = $data['location']['lon'];
-            return self::wgs84_gcj02($lat, $lng);
+            return self::wgs84Gcj02($lat, $lng);
         }
     }
 
@@ -86,7 +86,7 @@ class MapTiandi
     /**
      * CGCS2000（WGS84） 转成 GCJ02
      */
-    public static function wgs84_gcj02($lat, $lng)
+    public static function wgs84Gcj02($lat, $lng)
     {
         $PI = 3.1415926535897932384626;
         $a = 6378245.0;
