@@ -27,6 +27,13 @@ class AdminController extends AppController
     protected function init()
     {
         parent::init();
+        
+    }
+    /**
+     * 请求方法前
+     */
+    public function before()
+    {
         /**
          * 加载admin.css
          */
@@ -47,12 +54,6 @@ class AdminController extends AppController
             redirect($this->login_url);
         }
         $this->setSdebar();
-    }
-    /**
-     * 请求方法前
-     */
-    public function before()
-    {
         return $this->checkPermissions();
     }
     /**
