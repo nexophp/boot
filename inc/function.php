@@ -200,7 +200,7 @@ function get_ext_by_url($url)
             }
         }
     }
-    return $find;
+    return $find?:get_ext($url);
 }
 /**
  * 在线查看office文件
@@ -489,7 +489,7 @@ function download_remote_file($url, $path = '')
 {
     global $remote_to_local_path;
     $remote_to_local_path = $remote_to_local_path ?: '/uploads/tmp/' . date("Y-m-d");
-    $local_url = $remote_to_local_path . '/' . md5($url) . '.' . get_ext_by_url($url);
+    $local_url = $remote_to_local_path . '/' . md5($url) . '.' . get_ext($url);
     $file = WWW_PATH . $local_url;
     if (!file_exists($file) || (file_exists($file) && filesize($file) < 10)) {
         $context = get_remote_file($url);
