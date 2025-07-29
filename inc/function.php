@@ -2721,3 +2721,12 @@ function get_home_route()
     $homeClass = str_replace("/", "\\", $homeClass);
     return Route::runController($homeClass, 'actionIndex');
 }
+/**
+ * 是否api接口
+ */
+function is_api(){
+    $controller = Route::getActions()['controller']??'';
+    if(strpos($controller,'api') !== false){
+        return true;
+    }
+}
