@@ -144,12 +144,10 @@ function curl_get($url, $params = [], $click_option = [])
     $client = new \GuzzleHttp\Client($click_option);
     $res = $client->request('GET', $url, ['query' => $params]);
     $str = (string)$res->getBody();
-    try {
-        $array = json_decode($str, true);
-    } catch (\Exception $e) {
-        $array = [];
+    if(is_json($str)){
+        return json_decode($str, true);
     }
-    return $array ?: $str;
+    return $str;
 }
 /**
  * curl post
@@ -164,12 +162,10 @@ function curl_post($url, $params = [], $click_option = [])
     $client = new \GuzzleHttp\Client($click_option);
     $res = $client->request('POST', $url, $params);
     $str = (string)$res->getBody();
-    try {
-        $array = json_decode($str, true);
-    } catch (\Exception $e) {
-        $array = [];
+    if(is_json($str)){
+        return json_decode($str, true);
     }
-    return $array ?: $str;
+    return $str;
 }
 /**
  * curl put
@@ -186,10 +182,8 @@ function curl_put($upload_url, $local_file, $timeout = 300)
     $request = new \GuzzleHttp\Psr7\Request('PUT', $upload_url, $headers = [], $body);
     $res = $client->send($request, ['timeout' => $timeout]);
     $str = (string)$res->getBody();
-    try {
-        $array = json_decode($str, true);
-    } catch (\Exception $e) {
-        $array = [];
+    if(is_json($str)){
+        return json_decode($str, true);
     }
-    return $array ?: $str;
+    return $str;
 }
