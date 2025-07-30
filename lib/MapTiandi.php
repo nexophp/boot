@@ -32,21 +32,13 @@ class MapTiandi
     {
         return get_config("tianditu_js");
     }
-
-    public static function get($url, $data = '')
-    {
-        $client = guzzle_http();
-        $res    = $client->request('GET', $url);
-        $body = (string)$res->getBody();
-        return json_decode($body, true);
-    }
     /**
      * 根据lat lng取地址
      */
     public static function getAddress($lat, $lng)
     {
-        $url = "http://api.tianditu.gov.cn/geocoder?postStr={'lon':" . $lng . ",'lat':" . $lat . ",'ver':1}&type=geocode&tk=" . self::get_tk();
-        $data = self::get($url);
+        $url = "http://api.tianditu.gov.cn/geocoder?postStr={'lon':" . $lng . ",'lat':" . $lat . ",'ver':1}&type=geocode&tk=" . self::get_tk();   
+        $data = curl_get($url);
         if ($data['status'] == 0) {
             $res = $data['result'];
             $list = [];
@@ -67,7 +59,7 @@ class MapTiandi
     public static function getLat($address)
     {
         $url = 'http://api.tianditu.gov.cn/geocoder?ds={"keyWord":"' . $address . '"}&tk=' . self::get_tk();
-        $data = self::get($url);
+        $data = curl_get($url);
         if ($data['status'] == 0) {
             $lat = $data['location']['lat'];
             $lng = $data['location']['lon'];

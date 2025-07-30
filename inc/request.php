@@ -141,13 +141,17 @@ function get_full_url($with_http = false)
 function curl_get($url, $params = [], $click_option = [])
 {
     $click_option['timeout'] = $click_option['timeout'] ?: 60;
-    $client = new \GuzzleHttp\Client($click_option);
-    $res = $client->request('GET', $url, ['query' => $params]);
+    $client = new \GuzzleHttp\Client($click_option); 
+    if($params){
+        $res = $client->request('GET', $url, ['query' => $params]);
+    }else{
+        $res = $client->request('GET', $url);
+    }
     $str = (string)$res->getBody();
     if(is_json($str)){
         return json_decode($str, true);
     }
-    return $str;
+    return $str; 
 }
 /**
  * curl post
