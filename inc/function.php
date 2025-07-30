@@ -800,6 +800,7 @@ function json($data)
     $config['is_json'] = true;
     //JSON输出前
     do_action('json', $data);
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
 }
