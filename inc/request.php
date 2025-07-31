@@ -142,16 +142,22 @@ function curl_get($url, $params = [], $click_option = [])
 {
     $click_option['timeout'] = $click_option['timeout'] ?: 60;
     $client = new \GuzzleHttp\Client($click_option); 
-    if($params){
-        $res = $client->request('GET', $url, ['query' => $params]);
-    }else{
-        $res = $client->request('GET', $url);
+    try {
+        if($params){
+            $res = $client->request('GET', $url, ['query' => $params]);
+        }else{
+            $res = $client->request('GET', $url);
+        }
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str; 
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL GET异常".$url,$err,'error');
     }
-    $str = (string)$res->getBody();
-    if(is_json($str)){
-        return json_decode($str, true);
-    }
-    return $str; 
+    
 }
 /**
  * curl post
@@ -164,12 +170,18 @@ function curl_post($url, $params = [], $click_option = [])
 {
     $click_option['timeout'] = $click_option['timeout'] ?: 60;
     $client = new \GuzzleHttp\Client($click_option);
-    $res = $client->request('POST', $url, $params);
-    $str = (string)$res->getBody();
-    if(is_json($str)){
-        return json_decode($str, true);
+    try {
+        $res = $client->request('POST', $url, $params);
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str;
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL POST异常".$url,$err,'error');
     }
-    return $str;
+    
 }
 /**
  * curl put
@@ -184,10 +196,15 @@ function curl_put($upload_url, $local_file, $timeout = 300)
     $client = new \GuzzleHttp\Client($click_option);
     $body = file_get_contents($local_file);
     $request = new \GuzzleHttp\Psr7\Request('PUT', $upload_url, $headers = [], $body);
-    $res = $client->send($request, ['timeout' => $timeout]);
-    $str = (string)$res->getBody();
-    if(is_json($str)){
-        return json_decode($str, true);
-    }
-    return $str;
+    try {
+        $res = $client->send($request, ['timeout' => $timeout]);
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str;
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL PUT异常".$upload_url,$err,'error');
+    } 
 }
