@@ -96,6 +96,8 @@ class AppController
          * 基类控制器HOOK
          */
         do_action('AppController.init');
+        $str = $this->actions['module'] . '.' . $this->actions['controller'] . '.' . $this->actions['action'];
+        do_action($str);
     }
     /**
      * 获取用户信息
@@ -191,10 +193,13 @@ class AppController
      */
     public function after(&$data)
     {
+        $str = $this->actions['module'] . '.' . $this->actions['controller'] . '.' . $this->actions['action'];
+        do_action($str.'.data', $data);
         $action = $this->actions['action'];
         if (!$data) {
             $data = view($action, $this->view_data);
-        }
+            do_action($str.'.view', $data);
+        } 
     }
     /**
      * 加载资源文件
