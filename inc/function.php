@@ -492,7 +492,7 @@ function download_remote_file($url, $path = '')
     $local_url = $remote_to_local_path . '/' . md5($url) . '.' . get_ext($url);
     $file = WWW_PATH . $local_url;
     if (!file_exists($file) || (file_exists($file) && filesize($file) < 10)) {
-        $context = get_remote_file($url);
+        $context = curl_get($url);
         $mime = get_mime($url);
         $arr = ['mime' => $mime, 'url' => $url];
         do_action("download", $arr);
@@ -613,19 +613,6 @@ function get_mime_content($content, $just_return_ext = false)
         return substr($mime_type, strpos($mime_type, '/') + 1);
     }
     return $mime_type;
-}
-/**
- * 获取远程URL内容
- */
-function get_remote_file($url, $is_json = false)
-{
-    $client = guzzle_http();
-    $res    = $client->request('GET', $url);
-    $res =  (string)$res->getBody();
-    if ($is_json) {
-        $res = json_decode($res, true);
-    }
-    return $res;
 }
 /**
  * 移除主域名部分
@@ -800,6 +787,7 @@ function json($data)
     $config['is_json'] = true;
     //JSON输出前
     do_action('json', $data);
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
 }

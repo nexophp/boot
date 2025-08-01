@@ -23,7 +23,6 @@ function get_xss_clean_ins()
 function xss_clean_str($str)
 {
     $ins = get_xss_clean_ins();
-    do_action("xss_clean", $ins);
     return $ins->xss_clean($str);
 }
 /**
@@ -31,6 +30,9 @@ function xss_clean_str($str)
  */
 function xss_clean($input)
 {
+    if (!$input) {
+        return;
+    }
     if (is_array($input)) {
         foreach ($input as $k => &$v) {
             if ($v && is_string($v)) {
@@ -54,7 +56,9 @@ function global_trim()
     $in = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
     global_trim_inner($in);
 }
-
+/**
+ * 对数组递归去除首尾空格
+ */
 function global_trim_inner(&$in)
 {
     foreach ($in as $k => &$v) {
@@ -68,12 +72,12 @@ function global_trim_inner(&$in)
 /**
  * 取GET
  */
-function get($key = "")
+function get_query($key = "")
 {
     if ($key) {
-        return $_GET[$key];
+        return xss_clean($_GET[$key]);
     }
-    return $_GET;
+    return xss_clean($_GET);
 }
 /**
  * 取POST值
@@ -87,23 +91,21 @@ function get_post($key = "")
         if ($input && is_array($input) && !$val) {
             $val = $input[$key];
         }
-        return $val;
+        return xss_clean($val);
     } else {
-        return $data ?: $input;
+        return xss_clean($data ?: $input);
     }
 }
-
+/**
+ * 取GET POST
+ */
 function g($key = null)
 {
     $val = get_post($key);
     if (!$val) {
         $val = $key ? $_GET[$key] : $_GET;
     }
-    global $config;
-    if ($config['xss_clean'] == true) {
-        $val = xss_clean($val);
-    }
-    return $val;
+    return xss_clean($val);
 }
 
 /**
@@ -116,10 +118,10 @@ function get_input($key = '')
         $data = json_decode($data, true);
         global_trim_inner($data);
     }
-    if($key){
-        return $data[$key];
+    if ($key) {
+        return xss_clean($data[$key]);
     }
-    return $data;
+    return xss_clean($data);
 }
 /**
  * 取当前URL完整地址 
@@ -134,50 +136,75 @@ function get_full_url($with_http = false)
 }
 
 /**
- * CURL请求
- * 
- * GET
- * $client = guzzle_http();
- * $res    = $client->request('GET', $url);
- * return (string)$res->getBody();  
- * 
- * PUT
- * $body = file_get_contents($local_file);  
- * $request = new \GuzzleHttp\Psr7\Request('PUT', $upload_url, $headers=[], $body);
- * $response = $client->send($request, ['timeout' => 30]);
- * if($response->getStatusCode() == 200){
- *     return true;
- * } 
- * 
- * POST
- * $res    = $client->request('POST', $url,['body'=>]);
- * 
- * 
- * return (string)$res->getBody();  
- * 
- * JSON
- * 
- * $res = $client->request('POST', '/json.php', [
- *     'json' => ['foo' => 'bar']
- * ]);
- * 
- * 发送application/x-www-form-urlencoded POST请求需要你传入form_params
- * 
- * $res = $client->request('POST', $url, [
- *     'form_params' => [
- *         'field_name' => 'abc',
- *         'other_field' => '123',
- *         'nested_field' => [
- *             'nested' => 'hello'
- *         ]
- *     ]
- * ]);
- * 
- * 
+ * curl get
  */
-function guzzle_http($click_option = [])
+function curl_get($url, $params = [], $click_option = [])
+{
+    $click_option['timeout'] = $click_option['timeout'] ?: 60;
+    $client = new \GuzzleHttp\Client($click_option); 
+    try {
+        if($params){
+            $res = $client->request('GET', $url, ['query' => $params]);
+        }else{
+            $res = $client->request('GET', $url);
+        }
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str; 
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL GET异常".$url,$err,'error');
+    }
+    
+}
+/**
+ * curl post
+ * @param string $url
+ * @param array $params 发送的参数 ['json'=>[],'form_params'=>[]]
+ * @param array $click_option
+ * @return array|string
+ */
+function curl_post($url, $params = [], $click_option = [])
 {
     $click_option['timeout'] = $click_option['timeout'] ?: 60;
     $client = new \GuzzleHttp\Client($click_option);
-    return $client;
+    try {
+        $res = $client->request('POST', $url, $params);
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str;
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL POST异常".$url,$err,'error');
+    }
+    
+}
+/**
+ * curl put
+ * @param string $url
+ * @param array $params 发送的参数 ['json'=>[],'form_params'=>[]]
+ * @param array $click_option
+ * @return array|string
+ */
+function curl_put($upload_url, $local_file, $timeout = 300)
+{
+    $click_option['timeout'] = $timeout;
+    $client = new \GuzzleHttp\Client($click_option);
+    $body = file_get_contents($local_file);
+    $request = new \GuzzleHttp\Psr7\Request('PUT', $upload_url, $headers = [], $body);
+    try {
+        $res = $client->send($request, ['timeout' => $timeout]);
+        $str = (string)$res->getBody();
+        if(is_json($str)){
+            return json_decode($str, true);
+        }
+        return $str;
+    } catch (\Throwable $th) {
+        $err = $th->getMessage();
+        add_log("CURL PUT异常".$upload_url,$err,'error');
+    } 
 }

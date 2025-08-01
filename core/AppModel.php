@@ -177,47 +177,40 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
             }
         }
 
-        $data = $this->data;
-        if (!$this->ignore_relation || $isDynamic) {
-            $this->doRelation($data);
-            error_log("getRelation: $name, data[$name]: " . print_r($data[$name] ?? 'null', true));
-        }
-
+        // 手动处理关联数据加载
         if (isset($this->has_one[$name])) {
-            $relationData = $data[$name] ?? null;
-            if ($relationData && (is_array($relationData) || is_object($relationData))) {
-                $modelClass = $this->has_one[$name][0];
-                if (!class_exists($modelClass)) {
-                    error_log("Relation class $modelClass not found for $name");
+            $relationConfig = $this->has_one[$name];
+            $modelClass = $relationConfig[0];
+            $foreignKey = $relationConfig[1];
+            
+            if (isset($this->data[$foreignKey]) && $this->data[$foreignKey]) {
+                if (class_exists($modelClass)) {
+                    $relationData = $modelClass::model()->find(['id' => $this->data[$foreignKey]], 1);
+                    $this->data[$name] = $relationData;
+                } else {
                     $this->data[$name] = null;
-                    return null;
                 }
-                $model = new $modelClass();
-                $model->data = is_object($relationData) ? (array)$relationData : $relationData;
-                $this->data[$name] = $model;
             } else {
                 $this->data[$name] = null;
             }
         } elseif (isset($this->has_many[$name])) {
-            $relationData = $data[$name] ?? [];
-            $models = [];
-            if (is_array($relationData) || is_object($relationData)) {
-                $modelClass = $this->has_many[$name][0];
-                if (!class_exists($modelClass)) {
-                    error_log("Relation class $modelClass not found for $name");
+            $relationConfig = $this->has_many[$name];
+            $modelClass = $relationConfig[0];
+            $foreignKey = $relationConfig[1];
+            $localKey = $relationConfig[2] ?? 'id';
+            $options = $relationConfig[3] ?? [];
+            
+            if (isset($this->data[$localKey]) && $this->data[$localKey]) {
+                if (class_exists($modelClass)) {
+                    $where = [$foreignKey => $this->data[$localKey]];
+                    $relationData = $modelClass::model()->findAll($where + $options);
+                    $this->data[$name] = $relationData ?: [];
+                } else {
                     $this->data[$name] = [];
-                    return [];
                 }
-                $relationData = is_object($relationData) ? (array)$relationData : $relationData;
-                foreach ($relationData as $row) {
-                    $model = new $modelClass();
-                    $model->data = is_array($row) ? $row : (array)$row;
-                    $models[] = $model;
-                }
+            } else {
+                $this->data[$name] = [];
             }
-            $this->data[$name] = $models;
-        } else {
-            $this->data[$name] = null;
         }
 
         // 清理动态关联配置
