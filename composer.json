@@ -36,10 +36,7 @@
         "vlucas/valitron": "^1.4",
         "endroid/qr-code": "^6.0"
     },
-    "autoload": { 
-        "psr-0": {
-            "Upload": "./composer/codeguy/upload/src/"
-        },
+    "autoload": {
         "psr-4": {
             "lib\\": "./lib/",
             "core\\": "./core/"
