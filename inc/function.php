@@ -1106,8 +1106,11 @@ function price_format($yuan, $dot = 2)
 /**
  * 返回错误信息，JSON格式
  */
-function json_error($arr = [])
+function json_error($arr)
 {
+    if(!is_array($arr)){
+        $arr = ['msg'=>$arr];
+    }
     global $token;
     if ($token) {
         $arr['data']['token'] = $token;
@@ -1119,8 +1122,11 @@ function json_error($arr = [])
 /**
  * 返回成功信息，JSON格式
  */
-function json_success($arr = [])
+function json_success($arr)
 {
+    if(!is_array($arr)){
+        $arr = ['msg'=>$arr];
+    }
     global $token;
     if ($token) {
         $arr['data']['token'] = $token;
