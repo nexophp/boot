@@ -208,3 +208,10 @@ function curl_put($upload_url, $local_file, $timeout = 300)
         add_log("CURL PUT异常".$upload_url,$err,'error');
     } 
 }
+
+/**
+ * 当前模块 控制器 方法
+ */
+function get_uri(){
+    return Route::getActionString(); 
+}

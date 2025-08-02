@@ -265,6 +265,7 @@ function get_module_path($file)
  */
 function view($file, $params = [])
 {
+    do_action("view.start");
     $route = Route::getActions();
     $module = $route['module'];
     $controller = $route['controller'];
@@ -306,7 +307,8 @@ function view($file, $params = [])
     include $fined_file;
     $data = ob_get_clean();
     $data = trim($data);
-    do_action("view." . $module . '.' . $controller . '.' . $action, $data);
+    do_action($module . '.' . $controller . '.' . $action.'.view', $data);
+    do_action("view.end");
     return $data;
 }
 /**
