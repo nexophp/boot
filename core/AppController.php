@@ -38,11 +38,7 @@ class AppController
      * 用户id
      */
     protected $user_id = '';
-    protected $uid     = '';
-    /**
-     * 是否是api请求，仅当api请求时获取getHttpAuth
-     */
-    protected $is_api = false;
+    protected $uid     = ''; 
     /**
      * 模型
      */
@@ -106,10 +102,8 @@ class AppController
     {
         global $uid, $user_id;
         $uid = cookie('uid');
-        if (!$uid) {
-            if ($this->is_api) {
-                $uid = $this->getHttpAuth();
-            }
+        if (!$uid) { 
+            $uid = $this->getHttpAuth(); 
             if (!$uid) {
                 return [];
             }
