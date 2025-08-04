@@ -115,7 +115,7 @@ function get_user($user_id)
         $where = $user_id;
     } else {
         $where = ['id' => $user_id];
-    } 
+    }
     $user = db_get_one('user', "*", $where);
     if (!$user) {
         return;
@@ -201,31 +201,28 @@ function has_access($str)
 /**
  * 包含已安装的模块
  */
-try{
-    include_installed_modules();
-}catch(\Exception $e){ 
-}
+include_installed_modules();
 function include_installed_modules()
-{ 
+{
     global $modules;
-    $module_info = get_all_modules();
-    if ($module_info) {
-        foreach ($module_info as $file) {
-            $name = get_module_name($file);
-            if ($name) {
-                try {
+    try {
+        $module_info = get_all_modules();
+        if ($module_info) {
+            foreach ($module_info as $file) {
+                $name = get_module_name($file);
+                if ($name) {
                     $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
                     if ($module) {
                         require $file;
                     }
                     $modules[$name] = $module_info;
-                } catch (\Throwable $th) { 
-                } 
-            } else {
-                include $file;
-            } 
+                } else {
+                    include $file;
+                }
+            }
         }
-    } 
+    } catch (\Throwable $th) {
+    }
 }
 
 /**
@@ -312,7 +309,7 @@ function view($file, $params = [])
     include $fined_file;
     $data = ob_get_clean();
     $data = trim($data);
-    do_action($module . '.' . $controller . '.' . $action.'.view', $data);
+    do_action($module . '.' . $controller . '.' . $action . '.view', $data);
     do_action("view.end");
     return $data;
 }
@@ -336,9 +333,9 @@ function view_header($title)
 
     <body>
         <div id='app' v-cloak>
-        <?php
-        do_action('content');
-        ?>
+            <?php
+            do_action('content');
+            ?>
         <?php
     }
     /**
