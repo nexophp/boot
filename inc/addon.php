@@ -213,11 +213,14 @@ function include_installed_modules()
         foreach ($module_info as $file) {
             $name = get_module_name($file);
             if ($name) {
-                $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
-                if ($module) {
-                    require $file;
-                }
-                $modules[$name] = $module_info;
+                try {
+                    $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
+                    if ($module) {
+                        require $file;
+                    }
+                    $modules[$name] = $module_info;
+                } catch (\Throwable $th) { 
+                } 
             } else {
                 include $file;
             } 
