@@ -206,7 +206,8 @@ try{
 }catch(\Exception $e){ 
 }
 function include_installed_modules()
-{
+{ 
+    global $modules;
     $module_info = get_all_modules();
     if ($module_info) {
         foreach ($module_info as $file) {
@@ -216,11 +217,12 @@ function include_installed_modules()
                 if ($module) {
                     require $file;
                 }
+                $modules[$name] = $module_info;
             } else {
                 include $file;
-            }
+            } 
         }
-    }
+    } 
 }
 
 /**
