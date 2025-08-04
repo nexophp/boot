@@ -15,8 +15,7 @@ class ApiController extends AppController
     /**
      * 是否需要登录
      */
-    protected $need_login = true;
-    protected $is_api = true;
+    protected $need_login = true; 
     /**
      * 初始化
      */
