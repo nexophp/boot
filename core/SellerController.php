@@ -5,9 +5,14 @@ namespace core;
 class SellerController extends AdminController
 {
 	protected $user_tag = 'seller';
-
+	protected $seller_id;
 	public function  before()
 	{
+		$this->seller_id = db_get_one("seller","id",['user_id'=>$this->user_id]);
+		if (!$this->seller_id) {
+			json_error(['msg' => lang('商家不存在')]);
+		}
+
 		if ($this->isSupper()) {
 			return true;
 		}
