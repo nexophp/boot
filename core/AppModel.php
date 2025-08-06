@@ -31,18 +31,6 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
     protected $data = [];
 
     /**
-     * 是否为集合（多条记录）
-     * @var bool
-     */
-    protected $isCollection = false;
-
-    /**
-     * 集合中的模型
-     * @var array
-     */
-    protected $items = [];
-
-    /**
      * 初始化方法，设置用户ID
      */
     protected function init()
@@ -58,9 +46,6 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function offsetExists($offset): bool
     {
-        if ($this->isCollection) {
-            return isset($this->items[$offset]);
-        }
         return isset($this->data[$offset]) || $this->hasRelation($offset);
     }
 
@@ -71,9 +56,6 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function offsetGet($offset): mixed
     {
-        if ($this->isCollection) {
-            return $this->items[$offset] ?? null;
-        }
         if ($this->hasRelation($offset)) {
             return $this->getRelation($offset);
         }
@@ -97,11 +79,7 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function offsetSet($offset, $value): void
     {
-        if ($this->isCollection) {
-            $this->items[$offset] = $value;
-        } else {
-            $this->data[$offset] = $value;
-        }
+        $this->data[$offset] = $value;
     }
 
     /**
@@ -110,11 +88,7 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function offsetUnset($offset): void
     {
-        if ($this->isCollection) {
-            unset($this->items[$offset]);
-        } else {
-            unset($this->data[$offset]);
-        }
+        unset($this->data[$offset]);
     }
 
     /**
@@ -124,9 +98,6 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function __get($name)
     {
-        if ($this->isCollection) {
-            return $this->items[$name] ?? null;
-        }
         $method = $this->resolveGetterMethod($name);
         if ($method && method_exists($this, $method)) {
             $result = $this->$method();
@@ -150,11 +121,7 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      */
     public function __set($name, $value)
     {
-        if ($this->isCollection) {
-            $this->items[$name] = $value;
-        } else {
-            $this->data[$name] = $value;
-        }
+        $this->data[$name] = $value;
     }
 
     /**
@@ -215,7 +182,7 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
             $relationConfig = $this->has_one[$name];
             $modelClass = $relationConfig[0];
             $foreignKey = $relationConfig[1];
-
+            
             if (isset($this->data[$foreignKey]) && $this->data[$foreignKey]) {
                 if (class_exists($modelClass)) {
                     $relationData = $modelClass::model()->find(['id' => $this->data[$foreignKey]], 1);
@@ -232,12 +199,12 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
             $foreignKey = $relationConfig[1];
             $localKey = $relationConfig[2] ?? 'id';
             $options = $relationConfig[3] ?? [];
-
+            
             if (isset($this->data[$localKey]) && $this->data[$localKey]) {
                 if (class_exists($modelClass)) {
                     $where = [$foreignKey => $this->data[$localKey]];
                     $relationData = $modelClass::model()->findAll($where + $options);
-                    $this->data[$name] = $result = $relationData ?: [];
+                    $this->data[$name] = $relationData ?: [];
                 } else {
                     $this->data[$name] = [];
                 }
@@ -287,7 +254,7 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      * @param mixed $limit 限制条数
      * @param bool $use_select 是否使用原生查询
      * @param bool $ignore_hook 是否忽略钩子
-     * @return static 查询结果
+     * @return array|static|null 查询结果
      */
     public function find($where = '', $limit = '', $use_select = false, $ignore_hook = false)
     {
@@ -298,36 +265,34 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
         $results = parent::find($where, $limit, $use_select, $ignore_hook);
 
         if (empty($results)) {
-            $model = new static();
-            $model->isCollection = ($limit != 1);
-            return $model;
+            return $limit == 1 ? null : [];
         }
 
         if ($limit == 1 && is_array($results)) {
             $model = new static();
             $model->data = $results;
             if (!$this->ignore_relation && !empty($this->relation)) {
-                $this->doRelation($model->data);
+                $this->doRelation($model->data); 
             }
             $this->data = $model->data;
             $this->afterFind($model->data);
             return $model;
         }
 
-        $model = new static();
-        $model->isCollection = true;
-        $model->items = [];
+        $models = [];
         foreach ($results as $row) {
-            $item = new static();
-            $item->data = is_array($row) ? $row : (array)$row;
+            $model = new static();
+            $model->data = is_array($row) ? $row : (array)$row;
             if (!$this->ignore_relation && !empty($this->relation)) {
-                $this->doRelation($item->data);
+                $this->doRelation($model->data); 
             }
-            $item->afterFind($item->data);
-            $model->items[] = $item;
+            $this->data = $model->data;
+            $this->afterFind($model->data);
+            $models[] = $model;
         }
-
-        return $model;
+        $static = new static();
+        $static->data = $models;
+        return $static;
     }
 
     /**
@@ -342,23 +307,21 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
     {
         $result = parent::pager($join, $columns, $where, $ignore_hook);
 
-        $model = new static();
-        $model->isCollection = true;
-        $model->items = [];
+        $models = [];
         foreach ($result['data'] as $row) {
-            $item = new static();
-            $item->data = is_array($row) ? $row : (array)$row;
+            $model = new static();
+            $model->data = is_array($row) ? $row : (array)$row;
             if (!$this->ignore_relation && !empty($this->relation)) {
-                $this->doRelation($item->data);
+                $this->doRelation($model->data); 
             }
-            $item->afterFind($item->data);
-            $model->items[] = $item;
+            $this->data = $model->data;
+            $this->afterFind($model->data);
+            $models[] = $model;
         }
 
-        $result['data'] = $model;
+        $result['data'] = $models;
         return $result;
     }
-
     /**
      * 转换为 JSON 字符串
      */
@@ -366,18 +329,11 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
     {
         return $this->toArray();
     }
-
     /**
      * 转换为数组
      */
     public function toArray()
     {
-        if ($this->isCollection) {
-            return array_map(function ($item) {
-                return $item->toArray();
-            }, $this->items);
-        }
-
         $data = $this->data; // 只返回模型数据，不包含 protected/private 属性
 
         // 递归处理关联数据
@@ -403,14 +359,5 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
             self::$_instance[$name] = new static();
         }
         return self::$_instance[$name];
-    }
-
-    /**
-     * 获取第一个模型（仅对集合有效）
-     * @return static|null
-     */
-    public function first()
-    {
-        return $this->isCollection && !empty($this->items) ? $this->items[0] : null;
     }
 }
