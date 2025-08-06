@@ -196,6 +196,13 @@ function has_access($str)
             return true;
         }
     }
+    $data = [
+        'url' => $str,
+        'flag' => false,
+        'uid'=>$uid,
+    ];
+    do_action("has_access",$data);
+    return $data['flag']??false;
 }
 
 /**
