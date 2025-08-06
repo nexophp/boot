@@ -25,6 +25,9 @@ class SellerController extends AdminController
 	protected function isSupper()
 	{
 		if ($this->user_info['is_supper']) {
+			add_action("has_access", function (&$data) {
+				$data['flag'] = true;
+			});
 			return true;
 		}
 	}
