@@ -94,6 +94,9 @@ class AppController
         do_action('AppController.init');
         $str = $this->actions['module'] . '.' . $this->actions['controller'] . '.' . $this->actions['action'];
         do_action($str);
+        if (!has_installed_module($this->actions['module'])) {
+            json_error(['msg' => '模块未安装']);
+        }
     }
     /**
      * 获取用户信息

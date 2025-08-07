@@ -7,6 +7,8 @@
  * @date 2025
  */
 
+use function Clue\StreamFilter\fun;
+
 /**
  * 记录用户登录信息
  */
@@ -211,27 +213,40 @@ function has_access($str)
 include_installed_modules();
 function include_installed_modules()
 {
-    global $modules;
+    global $modules,$installed_modules; 
+    $REQUEST_URI = ltrim($_SERVER['REQUEST_URI'], '/'); 
     try {
-        $module_info = get_all_modules();
-        if ($module_info) {
-            foreach ($module_info as $file) {
+        $all_modules = get_all_modules(); 
+        if ($all_modules) {
+            foreach ($all_modules as $file) {
                 $name = get_module_name($file);
                 if ($name) {
                     $module = db_get_one("module", "id", ['name' => $name, 'status' => 1]);
-                    if ($module) {
+                    $module_info = [];
+                    if ($module || $REQUEST_URI == 'admin/module/list') {
                         require $file;
-                    }
+                    } 
                     $modules[$name] = $module_info;
+                    $installed_modules[$name] =  true;
                 } else {
                     include $file;
+                    $name = substr($file,0,strrpos($file,'/'));
+                    $name = substr($name,strrpos($name,'/')+1); 
+                    $installed_modules[$name] =  true;
                 }
             }
-        }
+        } 
     } catch (\Throwable $th) {
     }
 }
-
+/**
+ * 检查模块是否安装
+ */
+function has_installed_module($name)
+{
+    global $installed_modules;
+    return $installed_modules[$name]??false;
+}
 /**
  * 加载模块下的 auto_include.php
  */
