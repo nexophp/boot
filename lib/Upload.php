@@ -70,16 +70,16 @@ class Upload
             : WWW_PATH . '/' . $url . '/';
 
         if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
-            json_error(['msg' => [lang('无法创建目录')]]);
+            json_error(['msg' => lang('无法创建目录')]);
         }
 
         if (!isset($_FILES[$file_key]) || $_FILES[$file_key]['error'] === UPLOAD_ERR_NO_FILE) {
-            json_error(['msg' => [lang('没有上传文件')]]);
+            json_error(['msg' => lang('没有上传文件')]);
         }
 
         $file = $_FILES[$file_key];
         if ($file['error'] !== UPLOAD_ERR_OK) {
-            json_error(['msg' => [$this->getUploadError($file['error'])]]);
+            json_error(['msg' => $this->getUploadError($file['error'])]);
         }
 
         $new_filename = $this->user_id . Str::uuid();
