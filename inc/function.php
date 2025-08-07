@@ -200,7 +200,7 @@ function get_ext_by_url($url)
             }
         }
     }
-    return $find?:get_ext($url);
+    return $find ?: get_ext($url);
 }
 /**
  * 在线查看office文件
@@ -1108,8 +1108,8 @@ function price_format($yuan, $dot = 2)
  */
 function json_error($arr)
 {
-    if(!is_array($arr)){
-        $arr = ['msg'=>$arr];
+    if (!is_array($arr)) {
+        $arr = ['msg' => $arr];
     }
     global $token;
     if ($token) {
@@ -1124,8 +1124,8 @@ function json_error($arr)
  */
 function json_success($arr)
 {
-    if(!is_array($arr)){
-        $arr = ['msg'=>$arr];
+    if (!is_array($arr)) {
+        $arr = ['msg' => $arr];
     }
     global $token;
     if ($token) {
@@ -2358,10 +2358,58 @@ function install_sql_get_next($fp)
     return $sql;
 }
 /**
+ * 文件缓存
+ */
+function file_cache($key, $data = '', $second = null)
+{
+    global $config;
+    $pre = $config['cache_pre'] ?: 'www';
+    $key = $pre . $key;
+    $file = PATH . '/runtime/cache/' . $key.'.cache';
+    if ($data === null) {
+        @unlink($file);
+        return;
+    }
+    if ($data !== '') {
+        $new_data = [
+            'data' => $data, 
+        ];
+        if($second){
+            $new_data['time'] = time() + $second;
+        }
+        $value = json_encode($new_data, JSON_UNESCAPED_UNICODE);
+        @mkdir(dirname($file), 0755, true);
+        @file_put_contents($file, $value); 
+    } else {
+        $data = @file_get_contents($file); 
+         
+        if ($data) {
+            $data = json_decode($data, true);  
+            if($data['time']){
+                if($data['time'] > time()){ 
+                    return $data['data'];
+                }else {
+                    @unlink($file);
+                }
+            }else{
+                return $data['data'];
+            }
+        } 
+    }
+}
+/**
  * 缓存删除
  */
 function cache_delete($key)
 {
+    global $config;
+    $ori_key = $key;
+    $pre = $config['cache_pre'] ?: 'www';
+    $key = $pre . $key;
+    $cache_drive = $config['cache_drive'] ?: 'redis';
+    if ($cache_drive == 'file') {
+        return file_cache($ori_key, null);
+    }
     predis()->del($key);
 }
 /**
@@ -2372,6 +2420,15 @@ function cache_delete($key)
  */
 function cache($key, $data = '', $second = null)
 {
+    $ori_key = $key;
+    global $config;
+    $pre = $config['cache_pre'] ?: 'www';
+    $key = $pre . $key;
+
+    $cache_drive = $config['cache_drive'] ?: 'redis';
+    if ($cache_drive == 'file') {
+         return file_cache($ori_key, $data, $second);
+    }
     $redis = predis();
     $key = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $key);
     if ($data === null) {
@@ -2718,9 +2775,10 @@ function get_home_route()
 /**
  * 是否api接口
  */
-function is_api(){
-    $controller = Route::getActions()['controller']??'';
-    if(strpos($controller,'api') !== false){
+function is_api()
+{
+    $controller = Route::getActions()['controller'] ?? '';
+    if (strpos($controller, 'api') !== false) {
         return true;
     }
 }
