@@ -227,7 +227,9 @@ function include_installed_modules()
                         require $file;
                     } 
                     $modules[$name] = $module_info;
-                    $installed_modules[$name] =  true;
+                    if($module){
+                        $installed_modules[$name] =  true;
+                    }
                 } else {
                     include $file;
                     $name = substr($file,0,strrpos($file,'/'));
