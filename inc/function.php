@@ -779,6 +779,22 @@ function cdn()
     }
 }
 /**
+ * CDN CSS
+ */
+function cdn_css()
+{
+    global $config;
+    $host = $config['host'];
+    $arr  = $config['cdn_css'] ?: [];
+    $n    = count($arr);
+    if ($n > 0) {
+        $i    = mt_rand(0, $n - 1);
+        return $arr[$i] ?: '/';
+    } else {
+        return $host;
+    }
+}
+/**
  * json输出
  */
 function json($data)
@@ -2365,36 +2381,36 @@ function file_cache($key, $data = '', $second = null)
     global $config;
     $pre = $config['cache_pre'] ?: 'www';
     $key = $pre . $key;
-    $file = PATH . '/runtime/cache/' . $key.'.cache';
+    $file = PATH . '/runtime/cache/' . $key . '.cache';
     if ($data === null) {
         @unlink($file);
         return;
     }
     if ($data !== '') {
         $new_data = [
-            'data' => $data, 
+            'data' => $data,
         ];
-        if($second){
+        if ($second) {
             $new_data['time'] = time() + $second;
         }
         $value = json_encode($new_data, JSON_UNESCAPED_UNICODE);
         @mkdir(dirname($file), 0755, true);
-        @file_put_contents($file, $value); 
+        @file_put_contents($file, $value);
     } else {
-        $data = @file_get_contents($file); 
-         
+        $data = @file_get_contents($file);
+
         if ($data) {
-            $data = json_decode($data, true);  
-            if($data['time']){
-                if($data['time'] > time()){ 
+            $data = json_decode($data, true);
+            if ($data['time']) {
+                if ($data['time'] > time()) {
                     return $data['data'];
-                }else {
+                } else {
                     @unlink($file);
                 }
-            }else{
+            } else {
                 return $data['data'];
             }
-        } 
+        }
     }
 }
 /**
@@ -2427,7 +2443,7 @@ function cache($key, $data = '', $second = null)
 
     $cache_drive = $config['cache_drive'] ?: 'redis';
     if ($cache_drive == 'file') {
-         return file_cache($ori_key, $data, $second);
+        return file_cache($ori_key, $data, $second);
     }
     $redis = predis();
     $key = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $key);
