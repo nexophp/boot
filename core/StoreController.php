@@ -8,6 +8,8 @@ class StoreController extends AdminController
 	protected $store_id;
 	public function  before()
 	{
+		global $admin_type;
+		$admin_type = 'store';
 		$this->store_id = db_get_one("store", "id", ['user_id' => $this->user_id]);
 		if (!$this->store_id) { 
 			$sys_tag = $this->user_info['sys_tag'];

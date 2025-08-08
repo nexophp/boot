@@ -27,7 +27,8 @@ class AdminController extends AppController
     protected function init()
     {
         parent::init();
-        
+        global $admin_type;
+        $admin_type = 'admin';
     }
     /**
      * 请求方法前
