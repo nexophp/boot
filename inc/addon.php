@@ -6,8 +6,7 @@
  * @license MIT <https://mit-license.org/>
  * @date 2025
  */
-
-use function Clue\StreamFilter\fun;
+ 
 
 /**
  * 记录用户登录信息
