@@ -87,11 +87,14 @@ function set_data_info($node_id, $node_type, $field, $value)
  */
 function get_data_info($node_id, $node_type)
 {
-    $info = db_get_one("data_info", "*", ["node_id" => $node_id, "node_type" => $node_type]);
+    $info = db_get("data_info", "*", ["node_id" => $node_id, "node_type" => $node_type]);
+    $list = [];
     if ($info) {
-        return $info['value'];
+        foreach ($info as $v) {
+            $list[$v['field']] = $v['value'];
+        }
     }
-    return '';
+    return $list;
 }
 
 /**
