@@ -40,6 +40,14 @@ class AppController
     protected $user_id = '';
     protected $uid     = ''; 
     /**
+     * 商家id
+     */
+    protected $seller_id = 0;
+    /**
+     * 门店id
+     */
+    protected $store_id = 0;
+    /**
      * 模型
      */
     protected $model;
