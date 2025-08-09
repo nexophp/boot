@@ -9,7 +9,7 @@
 
 namespace core;
 
-class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
+class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable, \Iterator
 {
     private static $_instance;
     /**
@@ -29,6 +29,11 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
      * @var array
      */
     protected $data = [];
+
+    /**
+     * Iterator接口实现 - 当前位置
+     */
+    private $position = 0;
 
     /**
      * 初始化方法，设置用户ID
@@ -249,6 +254,49 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * Iterator接口实现 - 重置到开始位置
+     */
+    public function rewind(): void
+    {
+        $this->position = 0;
+    }
+
+    /**
+     * Iterator接口实现 - 获取当前元素
+     */
+    public function current()
+    {
+        if (is_array($this->data) && isset($this->data[$this->position])) {
+            return $this->data[$this->position];
+        }
+        return null;
+    }
+
+    /**
+     * Iterator接口实现 - 获取当前键
+     */
+    public function key()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Iterator接口实现 - 移动到下一个元素
+     */
+    public function next(): void
+    {
+        ++$this->position;
+    }
+
+    /**
+     * Iterator接口实现 - 检查当前位置是否有效
+     */
+    public function valid(): bool
+    {
+        return is_array($this->data) && isset($this->data[$this->position]);
+    }
+
+    /**
      * 查询记录，重写以支持对象化返回数据
      * @param mixed $where 查询条件
      * @param mixed $limit 限制条数
@@ -293,6 +341,17 @@ class AppModel extends \DbModel implements \ArrayAccess, \JsonSerializable
         $static = new static();
         $static->data = $models;
         return $static;
+    }
+
+    /**
+     * 查询所有记录，重写以支持对象化返回数据
+     * @param mixed $where 查询条件
+     * @param bool $ignore_hook 是否忽略钩子
+     * @return static 查询结果
+     */
+    public function findAll($where = '', $ignore_hook = false)
+    {
+        return $this->find($where, '', false, $ignore_hook);
     }
 
     /**
