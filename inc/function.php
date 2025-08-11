@@ -1892,9 +1892,9 @@ function render_js()
         $ret = [
             $all,
             $flag,
-        ]; 
-        $flag = do_action("js_code", $ret);
-        if ($flag) {
+        ];
+        do_action("js_code", $ret);
+        if ($ret[1]) {
             return;
         }
         echo '<script type="text/javascript">
@@ -1918,9 +1918,9 @@ function render_js_file()
         $ret = [
             $all,
             $flag,
-        ]; 
-        $flag = do_action("js_files", $ret);
-        if ($flag) {
+        ];
+        do_action("js_files", $ret);
+        if ($ret[1]) {
             return;
         }
         foreach ($all as $v) {
@@ -1962,9 +1962,9 @@ function render_css()
         $ret = [
             $all,
             $flag,
-        ]; 
-        $flag = do_action("css_code", $ret);
-        if ($flag) {
+        ];
+        do_action("css_code", $ret);
+        if ($ret[1]) {
             return;
         }
         echo '<style type="text/css">';
@@ -1986,9 +1986,9 @@ function render_css_file()
         $ret = [
             $all,
             $flag,
-        ]; 
-        $flag = do_action("css_files", $ret);
-        if ($flag) {
+        ];
+        do_action("css_files", $ret);
+        if ($ret[1]) {
             return;
         }
         foreach ($all as $v) {
