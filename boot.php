@@ -9,6 +9,10 @@ define('VERSION', "3.0.0");
  */
 if (!defined('DEBUG')) define('DEBUG', true);
 /**
+* 是否是命令行
+*/
+if (!defined('ISCLI')) define('DEBUG', false);
+/**
  * 项目路径
  */
 if (!defined('PATH')) define('PATH', realpath(__DIR__ . '/../../..'));
@@ -84,6 +88,9 @@ require __DIR__ . '/inc/addon.php';
 $include_file = PATH.'/include.php';
 if(file_exists($include_file)){
   include $include_file;
+}
+if(ISCLI){
+  return;
 }
 /**
  * 执行路由
