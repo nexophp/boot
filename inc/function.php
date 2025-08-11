@@ -1888,9 +1888,14 @@ function render_js()
         $all = array_merge($all, $js);
     }
     if ($all) {
-        $ret = do_action("js_code", $all);
-        if ($ret) {
-            return $ret;
+        $flag = false;
+        $ret = [
+            $all,
+            $flag,
+        ]; 
+        $flag = do_action("js_code", $ret);
+        if ($flag) {
+            return;
         }
         echo '<script type="text/javascript">
         $(function(){';
@@ -1909,9 +1914,14 @@ function render_js_file()
     global $_app;
     $all = $_app['js'] ?: [];
     if ($all) {
-        $ret = do_action("js_files", $all);
-        if ($ret) {
-            return $ret;
+        $flag = false;
+        $ret = [
+            $all,
+            $flag,
+        ]; 
+        $flag = do_action("js_files", $ret);
+        if ($flag) {
+            return;
         }
         foreach ($all as $v) {
             if (is_string($v)) {
@@ -1948,9 +1958,14 @@ function render_css()
         $all = array_merge($all, $css);
     }
     if ($all) {
-        $ret = do_action("css_code", $all);
-        if ($ret) {
-            return $ret;
+        $flag = false;
+        $ret = [
+            $all,
+            $flag,
+        ]; 
+        $flag = do_action("css_code", $ret);
+        if ($flag) {
+            return;
         }
         echo '<style type="text/css">';
         foreach ($all as $v) {
@@ -1967,9 +1982,14 @@ function render_css_file()
     global $_app;
     $all = $_app['css'] ?: [];
     if ($all) {
-        $ret = do_action("css_files", $all);
-        if ($ret) {
-            return $ret;
+        $flag = false;
+        $ret = [
+            $all,
+            $flag,
+        ]; 
+        $flag = do_action("css_files", $ret);
+        if ($flag) {
+            return;
         }
         foreach ($all as $v) {
             if (is_string($v)) {
