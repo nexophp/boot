@@ -374,17 +374,18 @@ function view_header($title)
         </div>
 
         <?php
-        do_action('footer');
-
+        do_action('footer'); 
         ?>
-        <?php if ($vue) { ?>
+        <?php if ($vue) {
+            $code = $vue->run();     
+            if($code){
+        ?>
             <script>
-                <?php
-
-                echo $vue->run();
+                <?php 
+                echo $code;
                 ?>
             </script>
-        <?php } ?>
+        <?php }} ?>
     </body>
 
     </html>
