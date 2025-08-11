@@ -11,7 +11,7 @@ if (!defined('DEBUG')) define('DEBUG', true);
 /**
 * 是否是命令行
 */
-if (!defined('ISCLI')) define('DEBUG', false);
+if (!defined('ISCLI')) define('ISCLI', false);
 /**
  * 项目路径
  */
