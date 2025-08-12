@@ -38,7 +38,7 @@ class AppController
      * 用户id
      */
     protected $user_id = '';
-    protected $uid     = ''; 
+    protected $uid     = '';
     /**
      * 商家id
      */
@@ -94,6 +94,9 @@ class AppController
         try {
             $this->_loadLang();
             $this->user_info = $this->getUserInfo();
+            $this->getSellerInfo();
+            $this->getStoreInfo();
+            $this->getAdminType();
         } catch (\Throwable $th) {
         }
         /**
@@ -113,8 +116,8 @@ class AppController
     {
         global $uid, $user_id;
         $uid = cookie('uid');
-        if (!$uid) { 
-            $uid = $this->getHttpAuth(); 
+        if (!$uid) {
+            $uid = $this->getHttpAuth();
             if (!$uid) {
                 return [];
             }
@@ -198,11 +201,11 @@ class AppController
      */
     public function after(&$data)
     {
-        $str = $this->actions['module'] . '.' . $this->actions['controller'] . '.' . $this->actions['action']; 
+        $str = $this->actions['module'] . '.' . $this->actions['controller'] . '.' . $this->actions['action'];
         $action = $this->actions['action'];
         if (!$data) {
-            $data = view($action, $this->view_data); 
-        } 
+            $data = view($action, $this->view_data);
+        }
     }
     /**
      * 加载资源文件
@@ -238,5 +241,53 @@ class AppController
         add_action("content", function () {
             element_vue();
         });
+    }
+    /**
+     * 获取店铺信息
+     */
+    public function getStoreInfo()
+    {
+        global $admin_type, $store_id;
+        $store_id = db_get_one("store", "id", ['user_id' => $this->user_id]);
+        if (!$store_id) {
+            $sys_tag = $this->user_info['sys_tag'];
+            if(strpos($sys_tag, 'store') !== false){
+                $store_id = substr($sys_tag, strpos($sys_tag, '.') + 1);
+            }  
+        }
+        $this->store_id = $store_id;
+        if ($this->store_id) {
+            $admin_type = 'store';
+        }
+        return $store_id;
+    }
+    /**
+     * 获取卖家信息
+     */
+    public function getSellerInfo()
+    {
+        global $admin_type, $seller_id;
+        $seller_id = db_get_one("seller", "id", ['user_id' => $this->user_id]);
+        if (!$seller_id) {
+            $sys_tag = $this->user_info['sys_tag'];
+            if(strpos($sys_tag, 'seller') !== false){
+                $seller_id = substr($sys_tag, strpos($sys_tag, '.') + 1);
+            } 
+        } 
+        $this->seller_id = $seller_id;
+        if ($this->seller_id) {
+            $admin_type = 'seller';
+        }
+        return $seller_id;
+    }
+    /**
+     * 获取管理员类型
+     */
+    public function getAdminType()
+    {
+        global $admin_type;
+        if($this->user_info['tag'] == 'admin'){
+            $admin_type = 'admin';
+        }
     }
 }

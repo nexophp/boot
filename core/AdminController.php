@@ -26,9 +26,7 @@ class AdminController extends AppController
     protected $login_url = '/admin/login/index';
     protected function init()
     {
-        parent::init();
-        global $admin_type;
-        $admin_type = 'admin';
+        parent::init(); 
     }
     /**
      * 请求方法前
