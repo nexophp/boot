@@ -8,7 +8,7 @@ class StoreController extends AdminController
 	protected $store_id;
 	public function  before()
 	{
-		global $admin_type;
+		global $admin_type,$store_id;
 		$admin_type = 'store';
 		$this->store_id = db_get_one("store", "id", ['user_id' => $this->user_id]);
 		if (!$this->store_id) { 
@@ -19,6 +19,7 @@ class StoreController extends AdminController
 				json_error(['msg' => lang('店铺不存在')]);
 			} 
 		}
+		$store_id = $this->store_id;
 		if ($this->isSupper()) {
 			return true;
 		}

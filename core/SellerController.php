@@ -8,13 +8,13 @@ class SellerController extends AdminController
 	protected $seller_id;
 	public function  before()
 	{
-		global $admin_type;
+		global $admin_type,$seller_id;
 		$admin_type = 'seller';
 		$this->seller_id = db_get_one("seller","id",['user_id'=>$this->user_id]);
 		if (!$this->seller_id) {
 			json_error(['msg' => lang('商家不存在')]);
 		}
-
+		$seller_id = $this->seller_id;
 		if ($this->isSupper()) {
 			return true;
 		}
