@@ -227,6 +227,7 @@ class AppController
         add_js("/misc/js/reconnecting-websocket.js");
         add_js("/misc/js/file-saver.js");
         add_js("/misc/js/xlsx.js");
+        add_js("/misc/js/echarts.js");
         add_js("/misc/wangeditor/index.js");
         add_css("/misc/wangeditor/css/style.css");
         add_js("/misc/js/app.js");
