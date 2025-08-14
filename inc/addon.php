@@ -139,8 +139,10 @@ function get_user($user_id)
 /**
  * 是否是管理员
  */
-function is_admin($uid = '')
+function is_admin($input_uid = '')
 {
+    global $uid; 
+    $uid = $input_uid?:$uid;
     $user = get_user($uid);
     if ($user && $user['tag'] == 'admin') {
         return true;
