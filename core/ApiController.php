@@ -15,13 +15,16 @@ class ApiController extends AppController
     /**
      * 是否需要登录
      */
-    protected $need_login = true; 
+    protected $need_login = true;
     /**
      * 初始化
      */
     protected function init()
-    {  
+    {
         parent::init();
         do_action('ApiController.init');
+        if ($this->need_login && !$this->uid) {
+            json_error(['msg' => lang('请先登录')]);
+        }
     }
 }
