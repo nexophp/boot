@@ -77,7 +77,7 @@ function set_data_info($node_id, $node_type, $field, $value)
 {
     $info = db_get_one("data_info", "*", ["node_id" => $node_id, "node_type" => $node_type, "field" => $field]);
     if ($info) {
-        db_update("data_info", ["id" => $info['id']], ["value" => $value]);
+        db_update("data_info", ["value" => $value], ["id" => $info['id']]);
     } else {
         db_insert("data_info", ["node_id" => $node_id, "node_type" => $node_type, "field" => $field, "value" => $value]);
     }
