@@ -58,6 +58,9 @@ class AppController
     {
         $this->post_data = get_post() ?: [];
         $this->input_data = get_input() ?: [];
+        if (is_post()) {
+            $this->input_data = $this->post_data;
+        }
         $this->actions = Route::getActions();
         $this->init();
         if ($this->model) {
