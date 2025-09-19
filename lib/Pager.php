@@ -1,9 +1,99 @@
 <?php
-
+/**
+* 主要用于用户端分页
+*/
 namespace lib;
 
 class Pager
 {
+    /**
+     * vue 分页
+     * 调用load()赋值 
+     * _this.last_page = res.last_page || 1; 
+     * _this.loading = false;
+     * _this.init_pager();
+     * 显示分页 \lib\Pager::vue();
+     * @param string $load 加载方法
+     */
+    public  static function vue($load = 'load()')
+    {
+        global $vue;
+
+        $page = "page";
+        $per_page = "per_page";
+        $last_page = "last_page";
+        $visiblePages = 'visible_pages';
+        $updatePagination = "init_pager";
+        $change = "change_page";
+
+        $vue->data($page, 1);
+        $vue->data($per_page, 1);
+        $vue->data($last_page, 1);
+
+        // 生成分页HTML结构
+        $html = ' 
+            <div class="pagination">
+                <!-- 上一页按钮 -->
+                <a class="page-btn prev" :class="{disabled: ' . $page . ' <= 1}" 
+                   @click="' . $page . ' > 1 && ' . $change . '(' . $page . ' - 1)">
+                    上一页
+                </a>
+
+                <!-- 第一页 -->
+                <a v-if="visiblePages[0] > 1" 
+                   class="page-btn" :class="{active: ' . $page . ' === 1}" 
+                   @click="' . $change . '(1)">1</a>
+                
+                <!-- 省略号 -->
+                <span v-if="visiblePages[0] > 2" class="page-dots">...</span>
+
+                <!-- 页码按钮 -->
+                <a v-for="pageNum in visiblePages" :key="pageNum"
+                   class="page-btn" :class="{active: ' . $page . ' === pageNum}" 
+                   @click="' . $change . '(pageNum)">{{ pageNum }}</a>
+
+                <!-- 省略号 -->
+                <span v-if="visiblePages[visiblePages.length - 1] < ' . $last_page . ' - 1" class="page-dots">...</span>
+                
+                <!-- 最后一页 -->
+                <a v-if="visiblePages[visiblePages.length - 1] < ' . $last_page . '" 
+                   class="page-btn" :class="{active: ' . $page . ' === ' . $last_page . '}" 
+                   @click="' . $change . '(' . $last_page . ')">{{ ' . $last_page . ' }}</a>
+
+                <!-- 下一页按钮 -->
+                <a class="page-btn next" :class="{disabled: ' . $page . ' >= ' . $last_page . '}" 
+                   @click="' . $page . ' < ' . $last_page . ' && ' . $change . '(' . $page . ' + 1)">
+                    下一页
+                </a>
+            </div>
+        ';
+        $vue->data($visiblePages, "[]");
+
+        $vue->method($updatePagination . '()', '
+            const maxVisible = 5;
+            const half = Math.floor(maxVisible / 2);
+            let startPage = Math.max(1, this.' . $page . ' - half);
+            let endPage = Math.min(this.' . $last_page . ', startPage + maxVisible - 1);
+            
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            this.visiblePages = [];
+            for (let i = startPage; i <= endPage; i++) {
+                this.visiblePages.push(i);
+            }
+        ');
+
+        $vue->method($change . "(page)", "
+            if (page >= 1 && page <= this." . $last_page . " && page !== this." . $page . ") {
+                this." . $page . " = page;
+                this." . $updatePagination . "();
+                this." . $load . ";
+            }
+        ");
+        return $html;
+    }
     /**
      * 分页渲染
      * @param string $url 分页url
