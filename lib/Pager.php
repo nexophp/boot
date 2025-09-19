@@ -1,7 +1,10 @@
 <?php
+
 /**
-* 主要用于用户端分页
-*/
+ * 主要用于前台分页
+ * vue分页是保存与render一样的分页结构
+ */
+
 namespace lib;
 
 class Pager
@@ -15,7 +18,7 @@ class Pager
      * 显示分页 \lib\Pager::vue();
      * @param string $load 加载方法
      */
-    public  static function vue($load = 'load()')
+    public  static function vue($load = 'load()', $size = 20)
     {
         global $vue;
 
@@ -27,7 +30,7 @@ class Pager
         $change = "change_page";
 
         $vue->data($page, 1);
-        $vue->data($per_page, 1);
+        $vue->data($per_page, $size);
         $vue->data($last_page, 1);
 
         // 生成分页HTML结构
