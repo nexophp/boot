@@ -19,7 +19,7 @@ function get_data_by_key($data = [], $step = [])
         return;
     }
     foreach ($step as $k) {
-        $find = $data[$step] ?? "";
+        $find = $data[$k] ?? "";
         if ($find) {
             return $find;
         }
