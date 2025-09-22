@@ -6,7 +6,22 @@
  * @license MIT <https://mit-license.org/>
  * @date 2025
  */
- 
+
+/**
+ * 获取数组中的key值
+ * @param array $data 数据
+ * @param array $step 步骤
+ * @return string
+ */
+function get_data_by_key($data = [], $step = [])
+{
+    foreach ($step as $k) {
+        $find = $data[$step] ?? "";
+        if ($find) {
+            return $find;
+        }
+    }
+}
 
 /**
  * 记录用户登录信息
@@ -141,8 +156,8 @@ function get_user($user_id)
  */
 function is_admin($input_uid = '')
 {
-    global $uid; 
-    $uid = $input_uid?:$uid;
+    global $uid;
+    $uid = $input_uid ?: $uid;
     $user = get_user($uid);
     if ($user && $user['tag'] == 'admin') {
         return true;
@@ -205,10 +220,10 @@ function has_access($str)
     $data = [
         'url' => $str,
         'flag' => false,
-        'uid'=>$uid,
+        'uid' => $uid,
     ];
-    do_action("has_access",$data);
-    return $data['flag']??false;
+    do_action("has_access", $data);
+    return $data['flag'] ?? false;
 }
 
 /**
@@ -217,10 +232,10 @@ function has_access($str)
 include_installed_modules();
 function include_installed_modules()
 {
-    global $modules,$installed_modules; 
-    $REQUEST_URI = ltrim($_SERVER['REQUEST_URI'], '/'); 
+    global $modules, $installed_modules;
+    $REQUEST_URI = ltrim($_SERVER['REQUEST_URI'], '/');
     try {
-        $all_modules = get_all_modules(); 
+        $all_modules = get_all_modules();
         if ($all_modules) {
             foreach ($all_modules as $file) {
                 $name = get_module_name($file);
@@ -229,19 +244,19 @@ function include_installed_modules()
                     $module_info = [];
                     if ($module || $REQUEST_URI == 'admin/module/list') {
                         require $file;
-                    } 
+                    }
                     $modules[$name] = $module_info;
-                    if($module){
+                    if ($module) {
                         $installed_modules[$name] =  true;
                     }
                 } else {
                     include $file;
-                    $name = substr($file,0,strrpos($file,'/'));
-                    $name = substr($name,strrpos($name,'/')+1); 
+                    $name = substr($file, 0, strrpos($file, '/'));
+                    $name = substr($name, strrpos($name, '/') + 1);
                     $installed_modules[$name] =  true;
                 }
             }
-        } 
+        }
     } catch (\Throwable $th) {
     }
 }
@@ -251,7 +266,7 @@ function include_installed_modules()
 function has_installed_module($name)
 {
     global $installed_modules;
-    return $installed_modules[$name]??false;
+    return $installed_modules[$name] ?? false;
 }
 /**
  * 加载模块下的 auto_include.php
@@ -376,18 +391,19 @@ function view_header($title)
         </div>
 
         <?php
-        do_action('footer'); 
+        do_action('footer');
         ?>
         <?php if ($vue) {
-            $code = $vue->run();     
-            if($code){
+            $code = $vue->run();
+            if ($code) {
         ?>
-            <script>
-                <?php 
-                echo $code;
-                ?>
-            </script>
-        <?php }} ?>
+                <script>
+                    <?php
+                    echo $code;
+                    ?>
+                </script>
+        <?php }
+        } ?>
     </body>
 
     </html>
