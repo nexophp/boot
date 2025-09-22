@@ -15,6 +15,9 @@
  */
 function get_data_by_key($data = [], $step = [])
 {
+    if (!$data || !$step) {
+        return;
+    }
     foreach ($step as $k) {
         $find = $data[$step] ?? "";
         if ($find) {
