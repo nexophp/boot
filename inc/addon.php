@@ -122,7 +122,7 @@ function set_user_info($user_id, $field, $value)
 {
     $info = db_get_one("user_info", "*", ["user_id" => $user_id, "field" => $field]);
     if ($info) {
-        db_update("user_info", ["id" => $info['id']], ["value" => $value]);
+        db_update("user_info", ["value" => $value], ["id" => $info['id']]);
     } else {
         db_insert("user_info", ["user_id" => $user_id, "field" => $field, "value" => $value]);
     }
