@@ -94,12 +94,12 @@ class AppController
     protected function init()
     {
         $this->_loadAssets();
+        $this->_loadLang();
+        $this->user_info = $this->getUserInfo();
+        $this->getAdminType();
         try {
-            $this->_loadLang();
-            $this->user_info = $this->getUserInfo();
             $this->getSellerInfo();
             $this->getStoreInfo();
-            $this->getAdminType();
         } catch (\Throwable $th) {
         }
         /**
@@ -255,9 +255,9 @@ class AppController
         $store_id = db_get_one("store", "id", ['user_id' => $this->user_id]);
         if (!$store_id) {
             $sys_tag = $this->user_info['sys_tag'];
-            if(strpos($sys_tag, 'store') !== false){
+            if (strpos($sys_tag, 'store') !== false) {
                 $store_id = substr($sys_tag, strpos($sys_tag, '.') + 1);
-            }  
+            }
         }
         $this->store_id = $store_id;
         if ($this->store_id) {
@@ -274,10 +274,10 @@ class AppController
         $seller_id = db_get_one("seller", "id", ['user_id' => $this->user_id]);
         if (!$seller_id) {
             $sys_tag = $this->user_info['sys_tag'];
-            if(strpos($sys_tag, 'seller') !== false){
+            if (strpos($sys_tag, 'seller') !== false) {
                 $seller_id = substr($sys_tag, strpos($sys_tag, '.') + 1);
-            } 
-        } 
+            }
+        }
         $this->seller_id = $seller_id;
         if ($this->seller_id) {
             $admin_type = 'seller';
@@ -290,7 +290,7 @@ class AppController
     public function getAdminType()
     {
         global $admin_type;
-        if($this->user_info['tag'] == 'admin'){
+        if ($this->user_info['tag'] == 'admin') {
             $admin_type = 'admin';
         }
     }
